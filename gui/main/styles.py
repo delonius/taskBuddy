@@ -50,8 +50,8 @@ def tabsStyle():
     return """
             QTabBar:tab { 
                 height: 50px; 
-                width: 150px; 
-                font-size: 16px;
+                width: 135px; 
+                font-size: 15px;
             }
             QTabBar:tab:selected {
                 font-weight: bold;

@@ -46,11 +46,37 @@ def finishButton(window):
 def applicantGroupBox(window):
     style = applicantBoxStyle()
     groupBox = QGroupBox(window)
-    groupBox.setGeometry(20, 20, 380, 300)
+    groupBox.setGeometry(20, 20, 380, 290)
     groupBox.setStyleSheet(style)
 
     return groupBox
 
+def taskInfoBox(window):
+    style = applicantBoxStyle()
+    infoBox = QGroupBox(window)
+    infoBox.setGeometry(20, 310, 380, 170)
+    infoBox.setStyleSheet(style)
+    infoBox.setTitle("Info")
+
+    return infoBox
+
+def setTaskBox(window):
+    style = applicantBoxStyle()
+    taskBox = QGroupBox(window)
+    taskBox.setGeometry(410, 20, 368, 230)
+    taskBox.setStyleSheet(style)
+    taskBox.setTitle("Tasks")
+
+    return taskBox
+
+def setNoteBox(window):
+    style = applicantBoxStyle()
+    noteBox = QGroupBox(window)
+    noteBox.setGeometry(410, 250, 368, 230)
+    noteBox.setStyleSheet(style)
+    noteBox.setTitle("Notes")
+
+    return noteBox
 
 def applicantPanel(parent):
     pass

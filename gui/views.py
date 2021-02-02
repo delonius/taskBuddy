@@ -2,7 +2,7 @@ from PyQt5.QtWidgets import QWidget, QTabWidget
 from PyQt5.QtCore import Qt
 from gui.main.widgets import inputBox, bottomRibbon, fetchButton, instructionLabel, logo, divider
 from gui.load.widgets import progressBar, fetchLabel, nameLabel, dupesLabel, tasksLabel
-from gui.applicant.widgets import indexTracker, prevButton, nextButton, applicantGroupBox, applicantPanel, finishButton
+from gui.applicant.widgets import indexTracker, prevButton, nextButton, applicantGroupBox, applicantPanel, finishButton, taskInfoBox, setTaskBox, setNoteBox
 from applicants import Applicants
 from gui.main.styles import tabsStyle
 
@@ -63,6 +63,9 @@ class ApplicantView(QWidget):
         self.prevButton = prevButton(self)
         self.indexTracker = indexTracker(self)
         self.applicantBox = applicantGroupBox(self)
+        self.taskInfoBox = taskInfoBox(self)
+        self.setTaskBox = setTaskBox(self)
+        self.setNoteBox = setNoteBox(self)
         self.updateInterface()
 
         if len(self.appList) == 1:

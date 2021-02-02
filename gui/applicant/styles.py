@@ -34,6 +34,14 @@ def applicantBoxStyle():
             QGroupBox {
                 font-family: Helvetica;
                 font-size: 20px;    
+                border: 1px solid #CCCCCC;
+                border-radius: 6px;
+                margin-top: 10px;
+            }
+            QGroupBox:title {
+                subcontrol-origin: margin;
+                left: 7px;
+                padding: 0px 5px 0px 5px;
             }
             """
 
@@ -44,8 +52,8 @@ def finishButtonStyle():
                 background-color: #B5DC10;
                 border: 1px solid #D9D9D9;
                 margin-top: 2px;
-                height: 48px; 
-                width: 70px; 
+                height: 50px; 
+                width: 100px; 
                 font-size: 16px;
                 font-weight: bold;
             }
