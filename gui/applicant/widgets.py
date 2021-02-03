@@ -1,6 +1,6 @@
 from PyQt5.QtWidgets import QLabel, QPushButton, QGroupBox, QFormLayout
 from PyQt5.QtCore import Qt
-from gui.applicant.styles import trackerStyle, buttonStyle, applicantBoxStyle, finishButtonStyle
+from gui.applicant.styles import trackerStyle, buttonStyle, applicantBoxStyle, finishButtonStyle, applicantPanelStyle, applicantPanelValueStyle
 from gui.applicant.actions import handleButtonNext, handleButtonPrev
 
 
@@ -79,4 +79,32 @@ def setNoteBox(window):
     return noteBox
 
 def applicantPanel(parent):
-    pass
+    fields = []
+    values = {}
+
+    panelStyle = applicantPanelStyle()
+    valueStyle = applicantPanelValueStyle()
+    idLabel = QLabel("Loan ID: ", parent)
+    idLabel.setGeometry(10, 50, 70, 20)
+    emailLabel = QLabel("Email: ", parent)
+    emailLabel.setGeometry(10, 80, 70, 20)
+
+    idValue = QLabel("", parent)
+    idValue.setGeometry(80, 50, 280, 20)
+    emailValue = QLabel("", parent)
+    emailValue.setGeometry(80, 80, 280, 20)
+
+    fields.append(idLabel)
+    fields.append(emailLabel)
+
+    values['loanID'] = idValue
+    values['email'] = emailValue
+
+    for field in fields:
+        field.setStyleSheet(panelStyle)
+
+    for key, value in values.items():
+        value.setStyleSheet(valueStyle)
+
+    return fields, values
+

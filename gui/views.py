@@ -86,6 +86,10 @@ class ApplicantView(QWidget):
             f"{self.index + 1} / {len(self.appList)}")
         self.activeApplicant = self.appList[self.index]
         self.applicantBox.setTitle(self.activeApplicant.name)
+        self.applicantFields, self.applicantValues = applicantPanel(self.applicantBox)
+
+        self.applicantValues['loanID'].setText(self.activeApplicant.loanID)
+        self.applicantValues['email'].setText(self.activeApplicant.email)
 
         if self.index > 0:
             self.prevButton.setHidden(False)

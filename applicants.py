@@ -88,7 +88,7 @@ class Applicant():
         self.name = f"{applicant.first_name} {applicant.last_name}"
         self.loanID = loanID
         self.emailAddresses = applicant.contact_data.email_addresses
-        self.email = self.emailAddresses[0] if self.emailAddresses else "N/A"
+        self.email = self.emailAddresses[0].address if self.emailAddresses else "N/A"
         self.phone = applicant.contact_data.phone_numbers[0]
         self.merchant = Group.get(applicant.group_id).name
         self.createdAt = applicant.created_at

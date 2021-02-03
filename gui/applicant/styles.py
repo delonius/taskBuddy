@@ -64,3 +64,20 @@ def finishButtonStyle():
                 background-color: #96b50d;
             }
             """
+
+def applicantPanelStyle():
+    return """
+            QLabel {
+                font-family: Helvetica;
+                font-size: 14px;
+                font-weight: bold;
+            }
+            """
+
+def applicantPanelValueStyle():
+    return """
+            QLabel {
+                font-family: Helvetica;
+                font-size: 14px;
+            }
+            """
