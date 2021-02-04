@@ -65,6 +65,7 @@ def finishButtonStyle():
             }
             """
 
+
 def applicantPanelStyle():
     return """
             QLabel {
@@ -74,10 +75,20 @@ def applicantPanelStyle():
             }
             """
 
+
 def applicantPanelValueStyle():
     return """
             QLabel {
                 font-family: Helvetica;
                 font-size: 14px;
+            }
+            """
+
+
+def applicantPanelMerchantStyle():
+    return """
+            QLabel {
+                font-family: Indie Flower;
+                font-size: 18px;
             }
             """

@@ -2,6 +2,7 @@ from highton.highton_settings import HightonSettings
 from highton.models import Person, Group
 from PyQt5.QtCore import QThread, pyqtSignal
 import time
+from datetime import datetime, timedelta
 
 
 class Applicants():
@@ -89,11 +90,26 @@ class Applicant():
         self.loanID = loanID
         self.emailAddresses = applicant.contact_data.email_addresses
         self.email = self.emailAddresses[0].address if self.emailAddresses else "N/A"
-        self.phone = applicant.contact_data.phone_numbers[0]
+        self.phone = applicant.contact_data.phone_numbers[0].number
         self.merchant = Group.get(applicant.group_id).name
-        self.createdAt = applicant.created_at
+        self.amountRequest = 'N/A'
+        self.createdAt = (datetime.fromisoformat(str(applicant.created_at)))
         self.duplicates = []
         self.existingTasks = []
+
+        if len(self.phone) == 10:
+            self.phone = '(' + self.phone[0:3] + ') ' + \
+                self.phone[3:6] + '-' + self.phone[6:]
+
+        if len(self.merchant) > 34:
+            self.merchant = self.merchant[:30] + '...'
+
+        self.createdAt = (self.createdAt + timedelta(hours=-5)
+                          ).strftime(f"%m/%d/%y %I:%M%p")
+
+        for field in self.applicant.subject_datas:
+            if field.subject_field_label == 'Loan Amount Request':
+                self.amountRequest = '$' + str(field.value)
 
     def __str__(self):
         return f"{self.name}: {self.email} | {self.loanID}"

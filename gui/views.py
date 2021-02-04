@@ -63,9 +63,12 @@ class ApplicantView(QWidget):
         self.prevButton = prevButton(self)
         self.indexTracker = indexTracker(self)
         self.applicantBox = applicantGroupBox(self)
+        self.applicantLabels, self.applicantValues = applicantPanel(
+            self.applicantBox)
         self.taskInfoBox = taskInfoBox(self)
         self.setTaskBox = setTaskBox(self)
         self.setNoteBox = setNoteBox(self)
+
         self.updateInterface()
 
         if len(self.appList) == 1:
@@ -86,10 +89,14 @@ class ApplicantView(QWidget):
             f"{self.index + 1} / {len(self.appList)}")
         self.activeApplicant = self.appList[self.index]
         self.applicantBox.setTitle(self.activeApplicant.name)
-        self.applicantFields, self.applicantValues = applicantPanel(self.applicantBox)
 
         self.applicantValues['loanID'].setText(self.activeApplicant.loanID)
         self.applicantValues['email'].setText(self.activeApplicant.email)
+        self.applicantValues['phone'].setText(self.activeApplicant.phone)
+        self.applicantValues['merchant'].setText(self.activeApplicant.merchant)
+        self.applicantValues['amountRequest'].setText(
+            self.activeApplicant.amountRequest)
+        self.applicantValues['date'].setText(self.activeApplicant.createdAt)
 
         if self.index > 0:
             self.prevButton.setHidden(False)
