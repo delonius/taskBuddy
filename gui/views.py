@@ -2,9 +2,10 @@ from PyQt5.QtWidgets import QWidget, QTabWidget
 from PyQt5.QtCore import Qt
 from gui.main.widgets import inputBox, bottomRibbon, fetchButton, instructionLabel, logo, divider
 from gui.load.widgets import progressBar, fetchLabel, nameLabel, dupesLabel, tasksLabel
-from gui.applicant.widgets import indexTracker, prevButton, nextButton, applicantGroupBox, applicantPanel, finishButton, taskInfoBox, setTaskBox, setNoteBox
+from gui.applicant.widgets import *
 from applicants import Applicants
 from gui.main.styles import tabsStyle
+from gui.applicant.actions import bindLinkButtons
 
 
 class MainView(QWidget):
@@ -65,6 +66,7 @@ class ApplicantView(QWidget):
         self.applicantBox = applicantGroupBox(self)
         self.applicantLabels, self.applicantValues = applicantPanel(
             self.applicantBox)
+        self.highriseButton = linkButtons(self.applicantBox, self.activeApplicant)
         self.taskInfoBox = taskInfoBox(self)
         self.setTaskBox = setTaskBox(self)
         self.setNoteBox = setNoteBox(self)
@@ -93,10 +95,16 @@ class ApplicantView(QWidget):
         self.applicantValues['loanID'].setText(self.activeApplicant.loanID)
         self.applicantValues['email'].setText(self.activeApplicant.email)
         self.applicantValues['phone'].setText(self.activeApplicant.phone)
-        self.applicantValues['merchant'].setText(self.activeApplicant.merchant)
         self.applicantValues['amountRequest'].setText(
             self.activeApplicant.amountRequest)
         self.applicantValues['date'].setText(self.activeApplicant.createdAt)
+
+        self.highriseButton.clicked.connect(lambda: bindLinkButtons(self.activeApplicant))
+
+        if self.activeApplicant.isReApp:
+            self.applicantValues['merchant'].setText(f"{self.activeApplicant.merchant} - {self.activeApplicant.company}")
+        else:
+            self.applicantValues['merchant'].setText(self.activeApplicant.merchant)
 
         if self.index > 0:
             self.prevButton.setHidden(False)

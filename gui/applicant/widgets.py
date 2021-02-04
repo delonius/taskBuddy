@@ -1,7 +1,7 @@
 from PyQt5.QtWidgets import QLabel, QPushButton, QGroupBox, QFormLayout
 from PyQt5.QtCore import Qt
 from gui.applicant.styles import *
-from gui.applicant.actions import handleButtonNext, handleButtonPrev
+from gui.applicant.actions import handleButtonNext, handleButtonPrev, bindLinkButtons
 
 
 def indexTracker(window):
@@ -136,3 +136,12 @@ def applicantPanel(parent):
         value.setTextInteractionFlags(Qt.TextSelectableByMouse)
 
     return labels, values
+
+
+def linkButtons(parent, applicant):
+    highriseStyle = highriseButtonStyle()
+    highriseButton = QPushButton("Highrise", parent)
+    highriseButton.setGeometry(40, 230, 120, 30)
+    highriseButton.setStyleSheet(highriseStyle)
+
+    return highriseButton

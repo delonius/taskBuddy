@@ -85,10 +85,20 @@ def applicantPanelValueStyle():
             """
 
 
-def applicantPanelMerchantStyle():
+def highriseButtonStyle():
     return """
-            QLabel {
-                font-family: Indie Flower;
-                font-size: 18px;
+            QPushButton {
+                font-size: 16px;
+                background-color: #F9D129;
+                border: 2px solid #888888;
+                border-radius: 10px;
+                font-family: Helvetica;
+                font-weight: bold;
+            }
+            QPushButton:hover {
+                background-color: #dbb727;
+            }
+            QPushButton:pressed {
+                background-color: #c7a622;
             }
             """

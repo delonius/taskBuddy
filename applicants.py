@@ -92,6 +92,10 @@ class Applicant():
         self.email = self.emailAddresses[0].address if self.emailAddresses else "N/A"
         self.phone = applicant.contact_data.phone_numbers[0].number
         self.merchant = Group.get(applicant.group_id).name
+        self.isReApp = False
+        self.company = ""
+        self.groupUsers = [user.name for user in Group.get(
+            self.applicant.group_id).users]
         self.amountRequest = 'N/A'
         self.createdAt = (datetime.fromisoformat(str(applicant.created_at)))
         self.duplicates = []
@@ -136,19 +140,37 @@ class Applicant():
     def addToGroup(self, applicants):
         applicants = applicants
         tags = [tag.name for tag in self.applicant.tags]
-        users = [user.name for user in Group.get(
-            self.applicant.group_id).users]
+        users = self.groupUsers
 
         if "reapp" in tags:
             applicants.addToReApp(self)
+            self.isReApp = True
         elif "Submitted to Gateway" not in tags:
             applicants.addToFlexxportal(self)
+            self.company = "Flexxportal"
         elif "Josh Utesch" in users:
             applicants.addToIqualify(self)
+            self.company = "iQualify"
         elif "ePay apps" in users:
             applicants.addToEpay(self)
+            self.company = "ePay"
         else:
             applicants.addToFlexxbuy(self)
+            self.company = "Flexxbuy"
+
+    def addReAppCompany(self):
+        tags = [tag.name for tag in self.applicant.tags]
+        users = self.groupUsers
+
+        if "Submitted to Gateway" not in tags:
+            self.company = "Flexxportal"
+        elif "Josh Utesch" in users:
+            self.company = "iQualify"
+        elif "ePay apps" in users:
+            self.company = "ePay"
+        else:
+            self.company = "Flexxbuy"
+
 
 
 class ApplicantsWorker(QThread):
@@ -178,6 +200,8 @@ class ApplicantsWorker(QThread):
             self.update_progress_label.emit("tasks", "")
             applicant.findTasks()
             applicant.addToGroup(applicants)
+            if applicant.isReApp:
+                applicant.addReAppCompany()
             self.update_progress.emit(applicants.getApplicantCount())
             self.update_progress_label.emit("clear", "")
         self.worker_success.emit(process_failed)
