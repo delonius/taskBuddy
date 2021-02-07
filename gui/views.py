@@ -1,11 +1,10 @@
-from PyQt5.QtWidgets import QWidget, QTabWidget
+from PyQt5.QtWidgets import QWidget, QTabWidget, QLabel
 from PyQt5.QtCore import Qt
 from gui.main.widgets import inputBox, bottomRibbon, fetchButton, instructionLabel, logo, divider
 from gui.load.widgets import progressBar, fetchLabel, nameLabel, dupesLabel, tasksLabel
 from gui.applicant.widgets import *
 from applicants import Applicants
 from gui.main.styles import tabsStyle
-from gui.applicant.actions import bindLinkButtons
 
 
 class MainView(QWidget):
@@ -64,9 +63,10 @@ class ApplicantView(QWidget):
         self.prevButton = prevButton(self)
         self.indexTracker = indexTracker(self)
         self.applicantBox = applicantGroupBox(self)
-        self.applicantLabels, self.applicantValues = applicantPanel(
-            self.applicantBox)
-        self.highriseButton = linkButtons(self.applicantBox, self.activeApplicant)
+        self.applicantPanel = ApplicantPanel(
+            self.activeApplicant, self.applicantBox)
+        self.applicantTabPanel = ApplicantTabPanel(
+            self.activeApplicant, self.applicantBox)
         self.taskInfoBox = taskInfoBox(self)
         self.setTaskBox = setTaskBox(self)
         self.setNoteBox = setNoteBox(self)
@@ -76,6 +76,13 @@ class ApplicantView(QWidget):
         if len(self.appList) == 1:
             self.indexTracker.setHidden(True)
             self.nextButton.setHidden(True)
+
+        if self.activeApplicant.duplicates:
+            self.applicantPanel.setHidden(True)
+            self.applicantTabPanel.setHidden(False)
+        else:
+            self.applicantPanel.setHidden(False)
+            self.applicantTabPanel.setHidden(True)
 
     def incrementIndex(self):
         self.index = self.index + 1
@@ -92,19 +99,14 @@ class ApplicantView(QWidget):
         self.activeApplicant = self.appList[self.index]
         self.applicantBox.setTitle(self.activeApplicant.name)
 
-        self.applicantValues['loanID'].setText(self.activeApplicant.loanID)
-        self.applicantValues['email'].setText(self.activeApplicant.email)
-        self.applicantValues['phone'].setText(self.activeApplicant.phone)
-        self.applicantValues['amountRequest'].setText(
-            self.activeApplicant.amountRequest)
-        self.applicantValues['date'].setText(self.activeApplicant.createdAt)
-
-        self.highriseButton.clicked.connect(lambda: bindLinkButtons(self.activeApplicant))
-
-        if self.activeApplicant.isReApp:
-            self.applicantValues['merchant'].setText(f"{self.activeApplicant.merchant} - {self.activeApplicant.company}")
+        if self.activeApplicant.duplicates:
+            self.applicantPanel.setHidden(True)
+            self.applicantTabPanel.setHidden(False)
+            self.applicantTabPanel.update(self.activeApplicant)
         else:
-            self.applicantValues['merchant'].setText(self.activeApplicant.merchant)
+            self.applicantPanel.setHidden(False)
+            self.applicantTabPanel.setHidden(True)
+            self.applicantPanel.update(self.activeApplicant)
 
         if self.index > 0:
             self.prevButton.setHidden(False)

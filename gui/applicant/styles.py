@@ -102,3 +102,35 @@ def highriseButtonStyle():
                 background-color: #c7a622;
             }
             """
+
+
+def gatewayButtonStyle():
+    return """
+            QPushButton {
+                font-size: 16px;
+                background-color: #B5DC10;
+                border: 2px solid #888888;
+                border-radius: 10px;
+                font-family: Helvetica;
+                font-weight: bold;
+            }
+            QPushButton:hover {
+                background-color: #a7c912;
+            }
+            QPushButton:pressed {
+                background-color: #96b50d;
+            }
+            """
+
+
+def applicantTabPanelStyle():
+    return """
+            QTabBar:tab { 
+                height: 30px; 
+                width: 75px; 
+                font-size: 11px;
+            }
+            QTabBar:tab:selected {
+                font-weight: normal;
+            }
+            """

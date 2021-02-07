@@ -1,7 +1,8 @@
-from PyQt5.QtWidgets import QLabel, QPushButton, QGroupBox, QFormLayout
+from PyQt5.QtWidgets import QLabel, QPushButton, QGroupBox, QFormLayout, QWidget, QTabWidget
 from PyQt5.QtCore import Qt
 from gui.applicant.styles import *
-from gui.applicant.actions import handleButtonNext, handleButtonPrev, bindLinkButtons
+from gui.applicant.actions import *
+from datetime import datetime
 
 
 def indexTracker(window):
@@ -82,66 +83,154 @@ def setNoteBox(window):
     return noteBox
 
 
-def applicantPanel(parent):
-    labels = []
-    values = {}
+class ApplicantTabPanel(QTabWidget):
+    def __init__(self, applicant, parent):
+        super().__init__(parent)
+        self.applicant = applicant
+        self.tabs = []
+        self.clear()
+        self.addTabs()
+        self.setGeometry(0, 25, 380, 265)
+        style = applicantTabPanelStyle()
+        self.setStyleSheet(style)
 
-    panelStyle = applicantPanelStyle()
-    valueStyle = applicantPanelValueStyle()
-    idLabel = QLabel("Loan ID: ", parent)
-    idLabel.setGeometry(10, 50, 80, 20)
-    emailLabel = QLabel("Email: ", parent)
-    emailLabel.setGeometry(10, 80, 80, 20)
-    phoneLabel = QLabel("Phone: ", parent)
-    phoneLabel.setGeometry(10, 110, 80, 20)
-    merchantLabel = QLabel("Merchant: ", parent)
-    merchantLabel.setGeometry(10, 140, 80, 20)
-    requestLabel = QLabel("Request: ", parent)
-    requestLabel.setGeometry(10, 170, 80, 20)
-    dateLabel = QLabel("Created: ", parent)
-    dateLabel.setGeometry(10, 200, 80, 20)
+    def update(self, applicant):
+        self.clear()
+        self.applicant = applicant
+        self.tabs = []
+        self.addTabs()
 
-    idValue = QLabel("", parent)
-    idValue.setGeometry(100, 50, 270, 20)
-    emailValue = QLabel("", parent)
-    emailValue.setGeometry(100, 80, 270, 20)
-    phoneValue = QLabel("", parent)
-    phoneValue.setGeometry(100, 110, 270, 20)
-    merchantValue = QLabel("", parent)
-    merchantValue.setGeometry(100, 140, 270, 20)
-    requestValue = QLabel("", parent)
-    requestValue.setGeometry(100, 170, 270, 20)
-    dateValue = QLabel("", parent)
-    dateValue.setGeometry(100, 200, 270, 20)
+    def addTabs(self):
+        for dupe in self.applicant.duplicates:
+            self.tabs.append(dupe)
 
-    labels.append(idLabel)
-    labels.append(emailLabel)
-    labels.append(phoneLabel)
-    labels.append(merchantLabel)
-    labels.append(requestLabel)
-    labels.append(dateLabel)
+        self.tabs = self.sortTabs()
 
-    values['loanID'] = idValue
-    values['email'] = emailValue
-    values['phone'] = phoneValue
-    values['merchant'] = merchantValue
-    values['amountRequest'] = requestValue
-    values['date'] = dateValue
+        for i in range(len(self.tabs)):
+            if self.tabs[i].isReApp:
+                self.addTab(ApplicantPanel(self.tab[i], self, 10, True))
+            else:
+                self.addTab(ApplicantPanel(self.tabs[i], self, 10),
+                            self.tabs[i].createdAt.split(' ')[0])
+        self.insertTab(0, ApplicantPanel(self.applicant, self, 10), 'Active')
+        self.setCurrentIndex(0)
 
-    for field in labels:
-        field.setStyleSheet(panelStyle)
-
-    for key, value in values.items():
-        value.setStyleSheet(valueStyle)
-        value.setTextInteractionFlags(Qt.TextSelectableByMouse)
-
-    return labels, values
+    def sortTabs(self):
+        tmp = self.tabs[:]
+        for i in range(len(tmp)):
+            createdAt = tmp[i].createdAt
+            tmp[i] = datetime.strptime(createdAt, "%m/%d/%y %I:%M%p")
+        tmp.sort()
+        tmp = tmp[::-1]
+        for dupe in self.applicant.duplicates:
+            index = tmp.index(datetime.strptime(
+                dupe.createdAt, "%m/%d/%y %I:%M%p"))
+            tmp[index] = dupe
+        return tmp
 
 
-def linkButtons(parent, applicant):
-    highriseStyle = highriseButtonStyle()
+class ApplicantPanel(QWidget):
+    def __init__(self, applicant, parent, y=30, reApp=False):
+        super().__init__(parent)
+        self.applicant = applicant
+        self.parent = parent
+        self.values = None
+        self.y = y
+        self.reApp = reApp
+        self.highriseButton = None
+        self.gatewayButton = None
+
+        self.addLabels()
+        self.addValues()
+        self.addButtons()
+        self.configureButtons()
+
+    def update(self, applicant):
+        self.applicant = applicant
+        self.values['loanID'].setText(self.applicant.loanID)
+        self.values['email'].setText(self.applicant.email)
+        self.values['phone'].setText(self.applicant.phone)
+        if self.applicant.isReApp or self.reApp:
+            self.values['merchant'].setText(
+                f"{self.applicant.merchant} - {self.applicant.company}")
+        else:
+            self.values['merchant'].setText(self.applicant.merchant)
+        self.values['amountRequest'].setText(
+            f"{self.applicant.amountRequest}")
+        self.values['createdAt'].setText(self.applicant.createdAt)
+        self.highriseButton.clicked.disconnect()
+        self.gatewayButton.clicked.disconnect()
+        self.configureButtons()
+
+    def addLabels(self):
+        labels = []
+        y = self.y
+        style = applicantPanelStyle()
+        labels.append(QLabel("Loan ID: ", self))
+        labels.append(QLabel("Email: ", self))
+        labels.append(QLabel("Phone: ", self))
+        labels.append(QLabel("Merchant: ", self))
+        labels.append(QLabel("Request: ", self))
+        labels.append(QLabel("Created: ", self))
+
+        for label in labels:
+            label.setGeometry(10, y, 80, 20)
+            label.setStyleSheet(style)
+            y = y + 30
+
+    def addValues(self):
+        values = {}
+        y = self.y
+        style = applicantPanelValueStyle()
+        values['loanID'] = QLabel(self.applicant.loanID, self)
+        values['email'] = QLabel(self.applicant.email, self)
+        values['phone'] = QLabel(self.applicant.phone, self)
+        if self.applicant.isReApp:
+            values['merchant'] = QLabel(
+                f"{self.applicant.merchant} - {self.applicant.company}", self)
+        else:
+            values['merchant'] = QLabel(self.applicant.merchant, self)
+        values['amountRequest'] = QLabel(self.applicant.amountRequest, self)
+        values['createdAt'] = QLabel(self.applicant.createdAt, self)
+
+        for value in values.values():
+            value.setGeometry(95, y, 270, 20)
+            value.setStyleSheet(style)
+            y = y + 30
+
+        self.values = values
+
+    def addButtons(self):
+        self.highriseButton = highriseButton(self, self.y)
+        self.gatewayButton = gatewayButton(self, self.y)
+
+    def configureButtons(self):
+        self.highriseButton.clicked.connect(
+            lambda: bindHighriseButton(self.applicant))
+
+        if self.applicant.company == 'Flexxportal':
+            self.gatewayButton.clicked.connect(
+                lambda: bindFlexxportalButton(self.applicant))
+            self.gatewayButton.setText("Portal")
+        else:
+            self.gatewayButton.clicked.connect(
+                lambda: bindGatewayButton(self.applicant))
+            self.gatewayButton.setText("Gateway")
+
+
+def highriseButton(parent, y):
+    style = highriseButtonStyle()
     highriseButton = QPushButton("Highrise", parent)
-    highriseButton.setGeometry(40, 230, 120, 30)
-    highriseButton.setStyleSheet(highriseStyle)
+    highriseButton.setGeometry(50, y + 185, 120, 30)
+    highriseButton.setStyleSheet(style)
 
     return highriseButton
+
+
+def gatewayButton(parent, y):
+    style = gatewayButtonStyle()
+    gatewayButton = QPushButton("Gateway", parent)
+    gatewayButton.setGeometry(210, y + 185, 120, 30)
+    gatewayButton.setStyleSheet(style)
+
+    return gatewayButton

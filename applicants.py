@@ -91,6 +91,7 @@ class Applicant():
         self.emailAddresses = applicant.contact_data.email_addresses
         self.email = self.emailAddresses[0].address if self.emailAddresses else "N/A"
         self.phone = applicant.contact_data.phone_numbers[0].number
+        self.address = applicant.contact_data.addresses[0].street
         self.merchant = Group.get(applicant.group_id).name
         self.isReApp = False
         self.company = ""
@@ -121,8 +122,8 @@ class Applicant():
     def findDuplicates(self):
         querySet = []
         querySet += Person.search(self.name)
-        querySet += Person.search(phone=self.phone)
         querySet += Person.search(email=self.email)
+        querySet += Person.search(street=self.address)
         for person in querySet:
             loanID = [
                 field.value for field in person.subject_datas if field.subject_field_label == 'GateWayLoanId'][0]
@@ -170,7 +171,6 @@ class Applicant():
             self.company = "ePay"
         else:
             self.company = "Flexxbuy"
-
 
 
 class ApplicantsWorker(QThread):
