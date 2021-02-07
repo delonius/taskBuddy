@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QLabel, QPushButton, QGroupBox, QFormLayout, QWidget, QTabWidget
+from PyQt5.QtWidgets import QLabel, QPushButton, QGroupBox, QFormLayout, QWidget, QTabWidget, QTreeWidget
 from PyQt5.QtCore import Qt
 from gui.applicant.styles import *
 from gui.applicant.actions import *
@@ -230,3 +230,11 @@ def gatewayButton(parent, y):
     gatewayButton.setStyleSheet(style)
 
     return gatewayButton
+
+
+class TaskPanel(QTreeWidget):
+    def __init__(self, parent):
+        super().__init__(parent)
+        style = taskPanelStyle()
+        self.setGeometry(10, 30, 348, 190)
+        self.setStyleSheet(style)

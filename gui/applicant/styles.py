@@ -134,3 +134,12 @@ def applicantTabPanelStyle():
                 font-weight: normal;
             }
             """
+
+
+def taskPanelStyle():
+    return """
+            QTreeWidget {
+                border: 1px solid #DDDDDD;
+                border-radius: 5px;
+            }
+            """
