@@ -90,7 +90,7 @@ class ApplicantTabPanel(QTabWidget):
         self.tabs = []
         self.clear()
         self.addTabs()
-        self.setGeometry(0, 25, 380, 265)
+        self.setGeometry(0, 25, 382, 265)
         style = applicantTabPanelStyle()
         self.setStyleSheet(style)
 
@@ -107,11 +107,8 @@ class ApplicantTabPanel(QTabWidget):
         self.tabs = self.sortTabs()
 
         for i in range(len(self.tabs)):
-            if self.tabs[i].isReApp:
-                self.addTab(ApplicantPanel(self.tab[i], self, 10, True))
-            else:
-                self.addTab(ApplicantPanel(self.tabs[i], self, 10),
-                            self.tabs[i].createdAt.split(' ')[0])
+            self.addTab(ApplicantPanel(self.tabs[i], self, 10),
+                        self.tabs[i].createdAt.split(' ')[0])
         self.insertTab(0, ApplicantPanel(self.applicant, self, 10), 'Active')
         self.setCurrentIndex(0)
 
@@ -130,13 +127,12 @@ class ApplicantTabPanel(QTabWidget):
 
 
 class ApplicantPanel(QWidget):
-    def __init__(self, applicant, parent, y=30, reApp=False):
+    def __init__(self, applicant, parent, y=30):
         super().__init__(parent)
         self.applicant = applicant
         self.parent = parent
         self.values = None
         self.y = y
-        self.reApp = reApp
         self.highriseButton = None
         self.gatewayButton = None
 
@@ -150,7 +146,7 @@ class ApplicantPanel(QWidget):
         self.values['loanID'].setText(self.applicant.loanID)
         self.values['email'].setText(self.applicant.email)
         self.values['phone'].setText(self.applicant.phone)
-        if self.applicant.isReApp or self.reApp:
+        if self.applicant.isReApp:
             self.values['merchant'].setText(
                 f"{self.applicant.merchant} - {self.applicant.company}")
         else:

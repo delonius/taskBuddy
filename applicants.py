@@ -127,11 +127,12 @@ class Applicant():
         for person in querySet:
             loanID = [
                 field.value for field in person.subject_datas if field.subject_field_label == 'GateWayLoanId'][0]
-            if f"{person.first_name} {person.last_name}".lower() == self.name.lower():
-                if loanID != self.loanID:
-                    loanIDs = [person.loanID for person in self.duplicates]
-                    if loanID not in loanIDs:
-                        self.duplicates.append(Applicant(person, loanID))
+            if loanID != self.loanID:
+                loanIDs = [person.loanID for person in self.duplicates]
+                if loanID not in loanIDs:
+                    duplicate = Applicant(person, loanID)
+                    if duplicate.merchant == self.merchant:
+                        self.duplicates.append(duplicate)
         for duplicate in self.duplicates:
             duplicate.findTasks()
 
@@ -146,6 +147,9 @@ class Applicant():
         if "reapp" in tags:
             applicants.addToReApp(self)
             self.isReApp = True
+            for dupe in self.duplicates:
+                dupe.isReApp = True
+                dupe.addReAppCompany()
         elif "Submitted to Gateway" not in tags:
             applicants.addToFlexxportal(self)
             self.company = "Flexxportal"
