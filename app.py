@@ -2,6 +2,7 @@ from PyQt5.QtWidgets import QApplication, QWidget, QStackedWidget, QMessageBox
 from PyQt5.QtGui import QIcon, QFontDatabase
 from gui.views import MainView, LoadView, ApplicantTabView
 from applicants import Applicants, ApplicantsWorker
+from gui.util import Config
 import sys
 
 

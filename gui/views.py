@@ -64,9 +64,9 @@ class ApplicantView(QWidget):
         self.indexTracker = indexTracker(self)
         self.applicantBox = applicantGroupBox(self)
         self.applicantPanel = ApplicantPanel(
-            self.activeApplicant, self.applicantBox)
+            self.activeApplicant, self.applicantBox, self)
         self.applicantTabPanel = ApplicantTabPanel(
-            self.activeApplicant, self.applicantBox)
+            self.activeApplicant, self.applicantBox, self)
         self.taskInfoBox = taskInfoBox(self)
         self.setTaskBox = setTaskBox(self)
         self.setTaskWidget = TaskPanel(self.setTaskBox, self.activeApplicant)

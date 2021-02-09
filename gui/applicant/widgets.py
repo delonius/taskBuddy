@@ -2,7 +2,8 @@ from PyQt5.QtWidgets import QLabel, QPushButton, QGroupBox, QFormLayout, QWidget
 from PyQt5.QtCore import Qt
 from gui.applicant.styles import *
 from gui.applicant.actions import *
-from datetime import datetime
+from gui.util import Config
+from datetime import datetime, timedelta
 
 
 def indexTracker(window):
@@ -84,15 +85,17 @@ def setNoteBox(window):
 
 
 class ApplicantTabPanel(QTabWidget):
-    def __init__(self, applicant, parent):
+    def __init__(self, applicant, parent, root):
         super().__init__(parent)
         self.applicant = applicant
+        self.root = root
         self.tabs = []
         self.clear()
         self.addTabs()
         self.setGeometry(0, 25, 382, 265)
         style = applicantTabPanelStyle()
         self.setStyleSheet(style)
+        #self.currentChanged.connect(self.updateTasks)
 
     def update(self, applicant):
         self.clear()
@@ -107,9 +110,9 @@ class ApplicantTabPanel(QTabWidget):
         self.tabs = self.sortTabs()
 
         for i in range(len(self.tabs)):
-            self.addTab(ApplicantPanel(self.tabs[i], self, 10),
+            self.addTab(ApplicantPanel(self.tabs[i], self, self.root, 10),
                         self.tabs[i].createdAt.split(' ')[0])
-        self.insertTab(0, ApplicantPanel(self.applicant, self, 10), 'Active')
+        self.insertTab(0, ApplicantPanel(self.applicant, self, self.root, 10), 'Active')
         self.setCurrentIndex(0)
 
     def sortTabs(self):
@@ -125,12 +128,17 @@ class ApplicantTabPanel(QTabWidget):
             tmp[index] = dupe
         return tmp
 
+    def updateTasks(self):
+        widget = self.widget(self.currentIndex())
+        self.root.setTaskWidget.update(widget.applicant)
+
 
 class ApplicantPanel(QWidget):
-    def __init__(self, applicant, parent, y=30):
+    def __init__(self, applicant, parent, root, y=30):
         super().__init__(parent)
         self.applicant = applicant
         self.parent = parent
+        self.root = root
         self.values = None
         self.y = y
         self.highriseButton = None
@@ -157,6 +165,7 @@ class ApplicantPanel(QWidget):
         self.highriseButton.clicked.disconnect()
         self.gatewayButton.clicked.disconnect()
         self.configureButtons()
+        self.root.setTaskWidget.update(self.applicant)
 
     def addLabels(self):
         labels = []
@@ -192,6 +201,7 @@ class ApplicantPanel(QWidget):
         for value in values.values():
             value.setGeometry(95, y, 270, 20)
             value.setStyleSheet(style)
+            value.setTextInteractionFlags(Qt.TextSelectableByMouse)
             y = y + 30
 
         self.values = values
@@ -240,9 +250,20 @@ class TaskPanel(QTreeWidget):
         self.setStyleSheet(style)
         self.setAlternatingRowColors(True)
         self.applicant = applicant
-        self.clear()
-        self.setHeaderLabels(['User', 'Category', 'Task'])
+        self.config = Config.getInstance()
+        self.setHeaderLabels(['User', 'Due', 'Task'])
+        self.setColumnWidth(0, 50)
+        self.setColumnWidth(1, 75)
 
+        self.update(self.applicant)
+
+
+    def update(self, applicant):
+        self.applicant = applicant
+        self.clear()
         for task in self.applicant.existingTasks:
+            abbrev = self.config.users[str(task.author_id)]['abbrev']
+            dueAtRaw = datetime.fromisoformat(str(task.due_at)) + timedelta(hours=-5)
+            dueAt = dueAtRaw.strftime(f"%m/%d-%#I%p")
             QTreeWidgetItem(
-                self, [str(task.author_id), str(task.category_id), task.body])
+                self, [abbrev, dueAt, task.body])
