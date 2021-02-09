@@ -69,7 +69,7 @@ class ApplicantView(QWidget):
             self.activeApplicant, self.applicantBox)
         self.taskInfoBox = taskInfoBox(self)
         self.setTaskBox = setTaskBox(self)
-        self.setTaskWidget = TaskPanel(self.setTaskBox)
+        self.setTaskWidget = TaskPanel(self.setTaskBox, self.activeApplicant)
         self.setNoteBox = setNoteBox(self)
 
         self.updateInterface()

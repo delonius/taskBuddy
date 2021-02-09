@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QLabel, QPushButton, QGroupBox, QFormLayout, QWidget, QTabWidget, QTreeWidget
+from PyQt5.QtWidgets import QLabel, QPushButton, QGroupBox, QFormLayout, QWidget, QTabWidget, QTreeWidget, QTreeWidgetItem, QHeaderView
 from PyQt5.QtCore import Qt
 from gui.applicant.styles import *
 from gui.applicant.actions import *
@@ -233,8 +233,16 @@ def gatewayButton(parent, y):
 
 
 class TaskPanel(QTreeWidget):
-    def __init__(self, parent):
+    def __init__(self, parent, applicant):
         super().__init__(parent)
         style = taskPanelStyle()
         self.setGeometry(10, 30, 348, 190)
         self.setStyleSheet(style)
+        self.setAlternatingRowColors(True)
+        self.applicant = applicant
+        self.clear()
+        self.setHeaderLabels(['User', 'Category', 'Task'])
+
+        for task in self.applicant.existingTasks:
+            QTreeWidgetItem(
+                self, [str(task.author_id), str(task.category_id), task.body])
