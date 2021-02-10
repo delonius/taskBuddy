@@ -54,17 +54,17 @@ def applicantGroupBox(window):
     return groupBox
 
 
-def taskInfoBox(window):
+def noteBox(window):
     style = applicantBoxStyle()
-    infoBox = QGroupBox(window)
-    infoBox.setGeometry(20, 310, 380, 170)
-    infoBox.setStyleSheet(style)
-    infoBox.setTitle("Info")
+    noteBox = QGroupBox(window)
+    noteBox.setGeometry(20, 310, 380, 170)
+    noteBox.setStyleSheet(style)
+    noteBox.setTitle("Notes")
 
-    return infoBox
+    return noteBox
 
 
-def setTaskBox(window):
+def taskBox(window):
     style = applicantBoxStyle()
     taskBox = QGroupBox(window)
     taskBox.setGeometry(410, 20, 368, 230)
@@ -74,14 +74,14 @@ def setTaskBox(window):
     return taskBox
 
 
-def setNoteBox(window):
+def createBox(window):
     style = applicantBoxStyle()
-    noteBox = QGroupBox(window)
-    noteBox.setGeometry(410, 250, 368, 230)
-    noteBox.setStyleSheet(style)
-    noteBox.setTitle("Notes")
+    createBox = QGroupBox(window)
+    createBox.setGeometry(410, 250, 368, 230)
+    createBox.setStyleSheet(style)
+    createBox.setTitle("Create")
 
-    return noteBox
+    return createBox
 
 
 class ApplicantTabPanel(QTabWidget):
@@ -96,7 +96,7 @@ class ApplicantTabPanel(QTabWidget):
         self.setGeometry(0, 25, 382, 265)
         style = applicantTabPanelStyle()
         self.setStyleSheet(style)
-        self.currentChanged.connect(self.updateTasks)
+        self.currentChanged.connect(self.updateData)
 
     def update(self, applicant):
         self.clear()
@@ -130,9 +130,10 @@ class ApplicantTabPanel(QTabWidget):
             tmp[index] = dupe
         return tmp
 
-    def updateTasks(self):
+    def updateData(self):
         index = self.currentIndex()
         self.root.setTaskWidget.update(self.tabs[index])
+        self.root.setNoteWidget.update(self.tabs[index])
         self.parent.setTitle(self.tabs[index].name)
 
 
@@ -152,6 +153,7 @@ class ApplicantPanel(QWidget):
         self.addButtons()
         self.configureButtons()
         self.root.setTaskWidget.update(self.applicant)
+        self.root.setNoteWidget.update(self.applicant)
 
     def update(self, applicant):
         self.applicant = applicant
@@ -170,6 +172,7 @@ class ApplicantPanel(QWidget):
         self.gatewayButton.clicked.disconnect()
         self.configureButtons()
         self.root.setTaskWidget.update(self.applicant)
+        self.root.setNoteWidget.update(self.applicant)
 
     def addLabels(self):
         labels = []
@@ -272,3 +275,29 @@ class TaskPanel(QTreeWidget):
             dueAt = dueAtRaw.strftime(f"%m/%d-%#I%p")
             task = QTreeWidgetItem(
                 self, [abbrev, dueAt, task.body])
+
+
+class NotePanel(QTreeWidget):
+    def __init__(self, parent, applicant):
+        super().__init__(parent)
+        style = taskPanelStyle()
+        self.setGeometry(10, 30, 360, 130)
+        self.setStyleSheet(style)
+        self.setAlternatingRowColors(True)
+        self.setRootIsDecorated(False)
+        self.applicant = applicant
+        self.config = Config.getInstance()
+        self.setHeaderLabels(['User','Note'])
+        self.setColumnWidth(0, 35)
+
+        self.update(self.applicant)
+
+
+    def update(self, applicant):
+        self.applicant = applicant
+        self.clear()
+        for note in self.applicant.existingNotes:
+            if not 'leadUuid' in note.body:
+                abbrev = self.config.users[str(note.author_id)]['abbrev']
+                note = QTreeWidgetItem(
+                    self, [abbrev, note.body])

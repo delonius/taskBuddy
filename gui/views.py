@@ -63,14 +63,15 @@ class ApplicantView(QWidget):
         self.prevButton = prevButton(self)
         self.indexTracker = indexTracker(self)
         self.applicantBox = applicantGroupBox(self)
-        self.setTaskBox = setTaskBox(self)
-        self.setTaskWidget = TaskPanel(self.setTaskBox, self.activeApplicant)
+        self.taskBox = taskBox(self)
+        self.setTaskWidget = TaskPanel(self.taskBox, self.activeApplicant)
+        self.noteBox = noteBox(self)
+        self.setNoteWidget = NotePanel(self.noteBox, self.activeApplicant)
         self.applicantPanel = ApplicantPanel(
             self.activeApplicant, self.applicantBox, self)
         self.applicantTabPanel = ApplicantTabPanel(
             self.activeApplicant, self.applicantBox, self)
-        self.taskInfoBox = taskInfoBox(self)
-        self.setNoteBox = setNoteBox(self)
+        self.createBox = createBox(self)
 
         self.updateInterface()
 

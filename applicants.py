@@ -102,6 +102,7 @@ class Applicant():
         self.createdAt = (datetime.fromisoformat(str(applicant.created_at)))
         self.duplicates = []
         self.existingTasks = []
+        self.existingNotes = []
 
         if len(self.phone) == 10:
             self.phone = '(' + self.phone[0:3] + ') ' + \
@@ -144,6 +145,7 @@ class Applicant():
 
     def findTasks(self):
         self.existingTasks = self.applicant.list_tasks()
+        self.existingNotes = self.applicant.list_notes()
 
     def addToGroup(self, applicants):
         applicants = applicants
