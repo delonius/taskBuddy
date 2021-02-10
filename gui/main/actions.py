@@ -33,17 +33,25 @@ def handleFetchClick(inputBox, app):
             dupesLabel.setText("")
             tasksLabel.setText("")
 
-    def workerSuccess(success):
-        QApplication.alert(app)
-        QApplication.beep()
-        appView = app.widget(app.appView)
-        appView.addTabs()
-        app.setCurrentIndex(app.appView)
-
-    if loanIDCount == 0:
+    def invalidData():
         app.displayMessage('Warning',
                            'Invalid data. \nPlease paste your list in the box.', 'warning')
         inputBox.selectAll()
+
+    def workerSuccess(success):
+        QApplication.alert(app)
+        if success:
+            QApplication.beep()
+            appView = app.widget(app.appView)
+            appView.addTabs()
+            app.setCurrentIndex(app.appView)
+        else:
+            app.widget(app.mainView)
+            app.setCurrentIndex(app.mainView)
+            invalidData()
+
+    if loanIDCount == 0:
+        invalidData()
     else:
         app.setCurrentIndex(app.loadView)
         app.worker.start()

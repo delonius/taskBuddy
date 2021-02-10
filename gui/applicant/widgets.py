@@ -257,8 +257,8 @@ class TaskPanel(QTreeWidget):
         self.applicant = applicant
         self.config = Config.getInstance()
         self.setHeaderLabels(['User', 'Due', 'Task'])
-        self.setColumnWidth(0, 40)
-        self.setColumnWidth(1, 80)
+        self.setColumnWidth(0, 35)
+        self.setColumnWidth(1, 90)
 
         self.update(self.applicant)
 

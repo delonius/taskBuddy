@@ -211,4 +211,7 @@ class ApplicantsWorker(QThread):
                 applicant.addReAppCompany()
             self.update_progress.emit(applicants.getApplicantCount())
             self.update_progress_label.emit("clear", "")
-        self.worker_success.emit(True)
+        if len(applicants.allIDs) > 0:
+            self.worker_success.emit(True)
+        else:
+            self.worker_success.emit(False)
