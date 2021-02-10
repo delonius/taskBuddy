@@ -33,20 +33,12 @@ def handleFetchClick(inputBox, app):
             dupesLabel.setText("")
             tasksLabel.setText("")
 
-    def workerSuccess(processFailed):
-        if not processFailed:
-            QApplication.alert(app)
-            QApplication.beep()
-            appView = app.widget(app.appView)
-            appView.addTabs()
-            app.setCurrentIndex(app.appView)
-
-    def workerFailure(loanID):
-        app.setCurrentIndex(app.mainView)
-        inputBox.setPlainText("")
-        app.displayMessage('Warning',
-                           f'Invalid LoanID detected: \n{loanID}', 'warning')
-        app.worker.terminate()
+    def workerSuccess(success):
+        QApplication.alert(app)
+        QApplication.beep()
+        appView = app.widget(app.appView)
+        appView.addTabs()
+        app.setCurrentIndex(app.appView)
 
     if loanIDCount == 0:
         app.displayMessage('Warning',
@@ -57,5 +49,4 @@ def handleFetchClick(inputBox, app):
         app.worker.start()
         app.worker.update_progress.connect(workerUpdateProgress)
         app.worker.update_progress_label.connect(workerUpdateLabel)
-        app.worker.worker_terminate.connect(workerFailure)
         app.worker.worker_success.connect(workerSuccess)

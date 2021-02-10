@@ -89,13 +89,14 @@ class ApplicantTabPanel(QTabWidget):
         super().__init__(parent)
         self.applicant = applicant
         self.root = root
+        self.parent = parent
         self.tabs = []
         self.clear()
         self.addTabs()
         self.setGeometry(0, 25, 382, 265)
         style = applicantTabPanelStyle()
         self.setStyleSheet(style)
-        #self.currentChanged.connect(self.updateTasks)
+        self.currentChanged.connect(self.updateTasks)
 
     def update(self, applicant):
         self.clear()
@@ -113,6 +114,7 @@ class ApplicantTabPanel(QTabWidget):
             self.addTab(ApplicantPanel(self.tabs[i], self, self.root, 10),
                         self.tabs[i].createdAt.split(' ')[0])
         self.insertTab(0, ApplicantPanel(self.applicant, self, self.root, 10), 'Active')
+        self.tabs.insert(0, self.applicant)
         self.setCurrentIndex(0)
 
     def sortTabs(self):
@@ -129,8 +131,9 @@ class ApplicantTabPanel(QTabWidget):
         return tmp
 
     def updateTasks(self):
-        widget = self.widget(self.currentIndex())
-        self.root.setTaskWidget.update(widget.applicant)
+        index = self.currentIndex()
+        self.root.setTaskWidget.update(self.tabs[index])
+        self.parent.setTitle(self.tabs[index].name)
 
 
 class ApplicantPanel(QWidget):
@@ -148,6 +151,7 @@ class ApplicantPanel(QWidget):
         self.addValues()
         self.addButtons()
         self.configureButtons()
+        self.root.setTaskWidget.update(self.applicant)
 
     def update(self, applicant):
         self.applicant = applicant
@@ -249,11 +253,12 @@ class TaskPanel(QTreeWidget):
         self.setGeometry(10, 30, 348, 190)
         self.setStyleSheet(style)
         self.setAlternatingRowColors(True)
+        self.setRootIsDecorated(False)
         self.applicant = applicant
         self.config = Config.getInstance()
         self.setHeaderLabels(['User', 'Due', 'Task'])
-        self.setColumnWidth(0, 50)
-        self.setColumnWidth(1, 75)
+        self.setColumnWidth(0, 40)
+        self.setColumnWidth(1, 80)
 
         self.update(self.applicant)
 
@@ -265,5 +270,5 @@ class TaskPanel(QTreeWidget):
             abbrev = self.config.users[str(task.author_id)]['abbrev']
             dueAtRaw = datetime.fromisoformat(str(task.due_at)) + timedelta(hours=-5)
             dueAt = dueAtRaw.strftime(f"%m/%d-%#I%p")
-            QTreeWidgetItem(
+            task = QTreeWidgetItem(
                 self, [abbrev, dueAt, task.body])

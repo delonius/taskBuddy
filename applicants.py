@@ -59,7 +59,7 @@ class Applicants():
         self.reApps.append(applicant)
 
     def parseListFromInput(self, text):
-        text = text.replace(' ', '\n').replace('--', '')
+        text = text.replace(' ', '\n').replace('---', '')
         tmp = [item for item in text.split(
             '\n') if len(item) == 36 and '-' in item]
         rawIDs = []
@@ -106,8 +106,8 @@ class Applicant():
             self.phone = '(' + self.phone[0:3] + ') ' + \
                 self.phone[3:6] + '-' + self.phone[6:]
 
-        if len(self.merchant) > 34:
-            self.merchant = self.merchant[:30] + '...'
+        if len(self.merchant) > 38:
+            self.merchant = self.merchant[:35] + '...'
 
         self.createdAt = (self.createdAt + timedelta(hours=-5)
                           ).strftime(f"%m/%d/%y %I:%M%p")
@@ -125,8 +125,11 @@ class Applicant():
         querySet += Person.search(email=self.email)
         querySet += Person.search(street=self.address)
         for person in querySet:
-            loanID = [
-                field.value for field in person.subject_datas if field.subject_field_label == 'GateWayLoanId'][0]
+            loanID = None
+            loanIDList = [
+                field.value for field in person.subject_datas if field.subject_field_label == 'GateWayLoanId']
+            if loanIDList:
+                loanID = loanIDList[0]
             if loanID != self.loanID:
                 loanIDs = [person.loanID for person in self.duplicates]
                 if loanID not in loanIDs:
@@ -141,7 +144,9 @@ class Applicant():
 
     def addToGroup(self, applicants):
         applicants = applicants
-        tags = [tag.name for tag in self.applicant.tags]
+        tags = []
+        if self.applicant.tags:
+            tags = [tag.name for tag in self.applicant.tags]
         users = self.groupUsers
 
         if "reapp" in tags:
@@ -150,15 +155,15 @@ class Applicant():
             for dupe in self.duplicates:
                 dupe.isReApp = True
                 dupe.addReAppCompany()
-        elif "Submitted to Gateway" not in tags:
-            applicants.addToFlexxportal(self)
-            self.company = "Flexxportal"
         elif "Josh Utesch" in users:
             applicants.addToIqualify(self)
             self.company = "iQualify"
-        elif "ePay apps" in users:
+        elif "Eric Eichlin" in users:
             applicants.addToEpay(self)
             self.company = "ePay"
+        elif "Submitted to Gateway" not in tags:
+            applicants.addToFlexxportal(self)
+            self.company = "Flexxportal"
         else:
             applicants.addToFlexxbuy(self)
             self.company = "Flexxbuy"
@@ -180,23 +185,17 @@ class Applicant():
 class ApplicantsWorker(QThread):
     update_progress = pyqtSignal(int)
     update_progress_label = pyqtSignal(str, str)
-    worker_terminate = pyqtSignal(str)
     worker_success = pyqtSignal(bool)
 
     def run(self):
-        process_failed = False
         applicants = Applicants.getInstance()
         for loanID in applicants.getLoanIDs():
             self.update_progress_label.emit("fetch", loanID)
             applicant = applicants.fetchHighriseApplicant(loanID)
-            if applicant == "duplicate":
+            if applicant == "duplicate" or not applicant:
                 applicants.applicants.append([])
                 self.update_progress.emit(applicants.getApplicantCount())
                 continue
-            if not applicant:
-                self.worker_terminate.emit(loanID)
-                process_failed = True
-                break
             self.update_progress_label.emit("name", applicant.name)
             time.sleep(1)
             self.update_progress_label.emit("duplicates", "")
@@ -208,4 +207,4 @@ class ApplicantsWorker(QThread):
                 applicant.addReAppCompany()
             self.update_progress.emit(applicants.getApplicantCount())
             self.update_progress_label.emit("clear", "")
-        self.worker_success.emit(process_failed)
+        self.worker_success.emit(True)

@@ -44,7 +44,7 @@ class ApplicantTabView(QTabWidget):
             "Flexxbuy": applicants.flexxbuyApps,
             "ePay": applicants.epayApps,
             "iQualify": applicants.iqualifyApps,
-            "Flexxportal": applicants.flexxportalApps,
+            "Portal": applicants.flexxportalApps,
             "Re-Applied": applicants.reApps
         }
 
@@ -63,13 +63,13 @@ class ApplicantView(QWidget):
         self.prevButton = prevButton(self)
         self.indexTracker = indexTracker(self)
         self.applicantBox = applicantGroupBox(self)
+        self.setTaskBox = setTaskBox(self)
+        self.setTaskWidget = TaskPanel(self.setTaskBox, self.activeApplicant)
         self.applicantPanel = ApplicantPanel(
             self.activeApplicant, self.applicantBox, self)
         self.applicantTabPanel = ApplicantTabPanel(
             self.activeApplicant, self.applicantBox, self)
         self.taskInfoBox = taskInfoBox(self)
-        self.setTaskBox = setTaskBox(self)
-        self.setTaskWidget = TaskPanel(self.setTaskBox, self.activeApplicant)
         self.setNoteBox = setNoteBox(self)
 
         self.updateInterface()
