@@ -24,6 +24,7 @@ class Applicants():
                         api_key='562b762e42c6b8b09858d228f94e3a03')
 
         self.rawIDs = None
+        self.allIDs = []
         self.applicants = []
         self.flexxbuyApps = []
         self.epayApps = []
@@ -120,6 +121,7 @@ class Applicant():
         return f"{self.name}: {self.email} | {self.loanID}"
 
     def findDuplicates(self):
+        applicants = Applicants.getInstance()
         querySet = []
         querySet += Person.search(self.name)
         querySet += Person.search(email=self.email)
@@ -132,10 +134,11 @@ class Applicant():
                 loanID = loanIDList[0]
             if loanID != self.loanID:
                 loanIDs = [person.loanID for person in self.duplicates]
-                if loanID not in loanIDs:
+                if loanID not in loanIDs and loanID not in applicants.allIDs:
                     duplicate = Applicant(person, loanID)
                     if duplicate.merchant == self.merchant:
                         self.duplicates.append(duplicate)
+                        applicants.allIDs.append(duplicate.loanID)
         for duplicate in self.duplicates:
             duplicate.findTasks()
 
@@ -192,10 +195,11 @@ class ApplicantsWorker(QThread):
         for loanID in applicants.getLoanIDs():
             self.update_progress_label.emit("fetch", loanID)
             applicant = applicants.fetchHighriseApplicant(loanID)
-            if applicant == "duplicate" or not applicant:
+            if applicant == "duplicate" or loanID in applicants.allIDs or not applicant:
                 applicants.applicants.append([])
                 self.update_progress.emit(applicants.getApplicantCount())
                 continue
+            applicants.allIDs.append(applicant)
             self.update_progress_label.emit("name", applicant.name)
             time.sleep(1)
             self.update_progress_label.emit("duplicates", "")
