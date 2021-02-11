@@ -31,4 +31,5 @@ class Config():
         with open('config.json') as f:
             data = json.load(f)
             self.users = data["users"]
+            self.taskCategories = data["taskCategories"]
             

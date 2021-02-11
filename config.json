@@ -15,6 +15,20 @@
         "1415386": {
             "name": "Lyndsey Brooke",
             "abbrev": "LB"
+        },
+        "1128657": {
+            "name": "Bob Lovinger",
+            "abbrev": "BL"
+        }
+    },
+    "taskCategories": {
+        "5734181": {
+            "color": "#e207c1",
+            "name": "Likely"
+        },
+        "6501637": {
+            "color": "#660099",
+            "name": "Unlikely"
         }
     }
 }

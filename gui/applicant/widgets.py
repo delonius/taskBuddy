@@ -1,5 +1,6 @@
 from PyQt5.QtWidgets import QLabel, QPushButton, QGroupBox, QFormLayout, QWidget, QTabWidget, QTreeWidget, QTreeWidgetItem, QHeaderView
 from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QColor
 from gui.applicant.styles import *
 from gui.applicant.actions import *
 from gui.util import Config
@@ -79,7 +80,7 @@ def createBox(window):
     createBox = QGroupBox(window)
     createBox.setGeometry(410, 250, 368, 230)
     createBox.setStyleSheet(style)
-    createBox.setTitle("Create")
+    createBox.setTitle("Add")
 
     return createBox
 
@@ -138,7 +139,7 @@ class ApplicantTabPanel(QTabWidget):
 
 
 class ApplicantPanel(QWidget):
-    def __init__(self, applicant, parent, root, y=30):
+    def __init__(self, applicant, parent, root, y=40):
         super().__init__(parent)
         self.applicant = applicant
         self.parent = parent
@@ -270,11 +271,16 @@ class TaskPanel(QTreeWidget):
         self.applicant = applicant
         self.clear()
         for task in self.applicant.existingTasks:
-            abbrev = self.config.users[str(task.author_id)]['abbrev']
-            dueAtRaw = datetime.fromisoformat(str(task.due_at)) + timedelta(hours=-5)
-            dueAt = dueAtRaw.strftime(f"%m/%d-%#I%p")
-            task = QTreeWidgetItem(
-                self, [abbrev, dueAt, task.body])
+            if str(task.author_id) in self.config.users:
+                abbrev = self.config.users[str(task.author_id)]['abbrev']
+                dueAtRaw = datetime.fromisoformat(str(task.due_at)) + timedelta(hours=-5)
+                dueAt = dueAtRaw.strftime(f"%m/%d-%#I%p")
+                categoryId = task.category_id
+                task = QTreeWidgetItem(
+                    self, [abbrev, dueAt, task.body])
+                if categoryId:
+                    task.setBackground(2, QColor(self.config.taskCategories[str(categoryId)]['color']))
+                    task.setForeground(2, QColor('white'))
 
 
 class NotePanel(QTreeWidget):
@@ -287,8 +293,9 @@ class NotePanel(QTreeWidget):
         self.setRootIsDecorated(False)
         self.applicant = applicant
         self.config = Config.getInstance()
-        self.setHeaderLabels(['User','Note'])
+        self.setHeaderLabels(['User', 'Date', 'Note'])
         self.setColumnWidth(0, 35)
+        self.setColumnWidth(1, 35)
 
         self.update(self.applicant)
 
@@ -297,7 +304,12 @@ class NotePanel(QTreeWidget):
         self.applicant = applicant
         self.clear()
         for note in self.applicant.existingNotes:
-            if not 'leadUuid' in note.body:
+            abbrev = ''
+            createdAtRaw = note.created_at
+            createdAt = createdAtRaw.strftime(f"%#m/%#d")
+            body = note.body.replace('\n', ' ')
+            if str(note.author_id) in self.config.users:
                 abbrev = self.config.users[str(note.author_id)]['abbrev']
+            if not 'leadUuid' in note.body:  
                 note = QTreeWidgetItem(
-                    self, [abbrev, note.body])
+                    self, [abbrev, createdAt, body])
