@@ -140,6 +140,7 @@ class ApplicantTabPanel(QTabWidget):
         index = self.currentIndex()
         self.root.setTaskWidget.update(self.tabs[index])
         self.root.setNoteWidget.update(self.tabs[index])
+        self.root.createPanel.addNotePanel.update(self.tabs[index])
         self.parent.setTitle(self.tabs[index].name)
 
 
@@ -179,6 +180,7 @@ class ApplicantPanel(QWidget):
         self.configureButtons()
         self.root.setTaskWidget.update(self.applicant)
         self.root.setNoteWidget.update(self.applicant)
+        self.root.createPanel.addNotePanel.update(self.applicant)
 
     def addLabels(self):
         labels = []
