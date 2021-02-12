@@ -1,4 +1,8 @@
 {
+    "auth": {
+        "username": "danw",
+        "token": "562b762e42c6b8b09858d228f94e3a03"
+    },
     "users": {
         "1332205": {
             "name": "Amanda Komorny",
@@ -19,6 +23,10 @@
         "1128657": {
             "name": "Bob Lovinger",
             "abbrev": "BL"
+        },
+        "1130809": {
+            "name": "Dan Wolf",
+            "abbrev": "DW"
         }
     },
     "taskCategories": {

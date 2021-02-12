@@ -1,10 +1,15 @@
-from PyQt5.QtWidgets import QLabel, QPushButton, QGroupBox, QFormLayout, QWidget, QTabWidget, QTreeWidget, QTreeWidgetItem, QHeaderView
-from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QColor
+from datetime import datetime, timedelta
+from gui.util import Config
 from gui.applicant.styles import *
 from gui.applicant.actions import *
-from gui.util import Config
-from datetime import datetime, timedelta
+from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QColor, QFont, QTextCharFormat
+from PyQt5.QtWidgets import (
+    QLabel, QPushButton, QGroupBox, QFormLayout, QWidget, QTabWidget,
+    QTreeWidget, QTreeWidgetItem, QHeaderView, QPlainTextEdit
+)
+from highton.models import Note
+
 
 
 def indexTracker(window):
@@ -303,6 +308,23 @@ class NotePanel(QTreeWidget):
     def update(self, applicant):
         self.applicant = applicant
         self.clear()
+
+        for note in self.applicant.newNotes[::-1]:
+            abbrev = ''
+            createdAtRaw = note.created_at
+            createdAt = createdAtRaw.strftime(f"%#m/%#d")
+            body = note.body.replace('\n', ' ')
+            if str(note.author_id) in self.config.users:
+                abbrev = self.config.users[str(note.author_id)]['abbrev']
+            if not 'leadUuid' in note.body:  
+                note = QTreeWidgetItem(
+                    self, [abbrev, createdAt, body])
+                fontFormat = QFont()
+                fontFormat.setWeight(QFont.Bold)
+                note.setFont(0, fontFormat)
+                note.setFont(1, fontFormat)
+                note.setFont(2, fontFormat)
+
         for note in self.applicant.existingNotes:
             abbrev = ''
             createdAtRaw = note.created_at
@@ -313,3 +335,54 @@ class NotePanel(QTreeWidget):
             if not 'leadUuid' in note.body:  
                 note = QTreeWidgetItem(
                     self, [abbrev, createdAt, body])
+
+
+
+class CreatePanel(QTabWidget):
+    def __init__(self, parent, root, applicant):
+        super().__init__(parent)
+        self.root = root
+        self.applicant = applicant
+        style = applicantTabPanelStyle()
+        self.setGeometry(0, 25, 370, 205)
+        self.setStyleSheet(style)
+        self.addNotePanel = AddNotePanel(self, self.root, self.applicant)
+
+        self.addTab(self.addNotePanel, "Note")
+
+
+
+class AddNotePanel(QWidget):
+    def __init__(self, parent, root, applicant):
+        super().__init__(parent)
+        self.applicant = applicant
+        self.root = root
+        self.config = Config.getInstance()
+
+        self.inputBoxStyle = inputBoxStyle()
+        self.textBox = QPlainTextEdit(self)
+        self.textBox.setGeometry(20, 20, 330, 100)
+        self.textBox.setStyleSheet(self.inputBoxStyle)
+
+        self.buttonStyle = gatewayButtonStyle()
+        self.button = QPushButton("Add Note", self)
+        self.button.setGeometry(125, 135, 120, 30)
+        self.button.setStyleSheet(self.buttonStyle)
+        self.button.clicked.connect(self.addNote)
+
+    def update(self, applicant):
+        self.applicant = applicant
+
+
+    def addNote(self):
+        body = self.textBox.toPlainText()
+        if body:
+            note = Note()
+            note.body = body
+            note.author_id = self.config.id
+            note.subject_type = "Party"
+            note.subject_id = self.applicant.highriseID
+            note.created_at = datetime.now()
+            self.applicant.newNotes.append(note)
+            self.root.setNoteWidget.update(self.applicant)
+            self.textBox.setPlainText("")

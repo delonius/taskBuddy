@@ -1,4 +1,3 @@
-from highton.highton_settings import HightonSettings
 from highton.models import Person, Group
 from PyQt5.QtCore import QThread, pyqtSignal
 import time
@@ -19,9 +18,6 @@ class Applicants():
             raise Exception("This is a singleton class")
         else:
             Applicants.__instance = self
-
-        HightonSettings(username='danw@flexxbuyapps',
-                        api_key='562b762e42c6b8b09858d228f94e3a03')
 
         self.rawIDs = None
         self.allIDs = []
@@ -103,6 +99,7 @@ class Applicant():
         self.duplicates = []
         self.existingTasks = []
         self.existingNotes = []
+        self.newNotes = []
 
         if len(self.phone) == 10:
             self.phone = '(' + self.phone[0:3] + ') ' + \

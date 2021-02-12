@@ -143,3 +143,18 @@ def taskPanelStyle():
                 border-radius: 5px;
             }
             """
+
+
+def inputBoxStyle():
+    return """
+            QPlainTextEdit {
+                border-radius: 6px;
+                border: 1px solid #CCCCCC;
+                background-color: #FDFDFD;
+                font-size: 14px;
+            }
+            QScrollBar:vertical {
+                width: 14px;
+                background-color: #819C0B;
+            }
+            """

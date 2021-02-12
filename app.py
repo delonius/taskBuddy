@@ -14,6 +14,7 @@ class MainWindow(QStackedWidget):
         self.setGeometry(200, 200, 800, 600)
         self.setFixedSize(800, 600)
         self.setStyleSheet("background-color: white")
+        self.config = Config.getInstance()
 
         self.worker = ApplicantsWorker()
 

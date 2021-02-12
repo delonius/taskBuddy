@@ -72,6 +72,7 @@ class ApplicantView(QWidget):
         self.applicantTabPanel = ApplicantTabPanel(
             self.activeApplicant, self.applicantBox, self)
         self.createBox = createBox(self)
+        self.createPanel = CreatePanel(self.createBox, self, self.activeApplicant)
 
         self.updateInterface()
 
