@@ -6,7 +6,7 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QColor, QFont, QTextCharFormat
 from PyQt5.QtWidgets import (
     QLabel, QPushButton, QGroupBox, QFormLayout, QWidget, QTabWidget,
-    QTreeWidget, QTreeWidgetItem, QHeaderView, QPlainTextEdit
+    QTreeWidget, QTreeWidgetItem, QHeaderView, QPlainTextEdit, QComboBox
 )
 from highton.models import Note
 
@@ -348,10 +348,47 @@ class CreatePanel(QTabWidget):
         style = applicantTabPanelStyle()
         self.setGeometry(0, 25, 370, 205)
         self.setStyleSheet(style)
+        self.addTaskPanel = AddTaskPanel(self, self.root, self.applicant)
         self.addNotePanel = AddNotePanel(self, self.root, self.applicant)
 
+        self.addTab(self.addTaskPanel, "Task")
         self.addTab(self.addNotePanel, "Note")
 
+
+class AddTaskPanel(QWidget):
+    def __init__(self, parent, root, applicant):
+        super().__init__(parent)
+        self.applicant = applicant
+        self.root = root
+        self.config = Config.getInstance()
+        self.addWidgets()
+        self.populateFields()
+
+    
+    def addWidgets(self):
+        self.taskLabel = QLabel("Task: ", self)
+        self.taskLabel.setGeometry(20, 20, 50, 30)
+        self.taskLabel.setStyleSheet("font-weight: bold;")
+
+        self.userLabel = QLabel("User: ", self)
+        self.userLabel.setGeometry(20, 60, 50, 30)
+        self.userLabel.setStyleSheet("font-weight: bold;")
+
+        self.inputBoxStyle = inputBoxStyle()
+        self.taskInput = QPlainTextEdit(self)
+        self.taskInput.setGeometry(70, 23, 280, 30)
+        self.taskInput.setStyleSheet(self.inputBoxStyle)
+
+        self.userBox = QComboBox(self)
+        self.userBox.setGeometry(70, 63, 120, 30)
+
+    
+    def populateFields(self):
+        self.userBox.addItems(['Me'])
+        for user, value in self.config.users.items():
+            if not user == str(self.config.id):
+                name = value['name']
+                self.userBox.addItems([name])
 
 
 class AddNotePanel(QWidget):
@@ -374,7 +411,6 @@ class AddNotePanel(QWidget):
 
     def update(self, applicant):
         self.applicant = applicant
-
 
     def addNote(self):
         body = self.textBox.toPlainText()
