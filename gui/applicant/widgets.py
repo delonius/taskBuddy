@@ -363,7 +363,7 @@ class AddNotePanel(QWidget):
 
         self.inputBoxStyle = inputBoxStyle()
         self.textBox = QPlainTextEdit(self)
-        self.textBox.setGeometry(20, 20, 330, 100)
+        self.textBox.setGeometry(17, 20, 330, 100)
         self.textBox.setStyleSheet(self.inputBoxStyle)
 
         self.buttonStyle = gatewayButtonStyle()
