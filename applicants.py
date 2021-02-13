@@ -99,6 +99,7 @@ class Applicant():
         self.duplicates = []
         self.existingTasks = []
         self.existingNotes = []
+        self.newTasks = []
         self.newNotes = []
 
         if len(self.phone) == 10:
