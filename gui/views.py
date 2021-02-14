@@ -64,7 +64,8 @@ class ApplicantView(QWidget):
         self.indexTracker = indexTracker(self)
         self.applicantBox = applicantGroupBox(self)
         self.taskBox = taskBox(self)
-        self.setTaskWidget = TaskPanel(self.taskBox, self.activeApplicant)
+        self.setTaskWidget = TaskPanel(
+            self.taskBox, self, self.activeApplicant)
         self.noteBox = noteBox(self)
         self.setNoteWidget = NotePanel(self.noteBox, self.activeApplicant)
         self.applicantPanel = ApplicantPanel(
@@ -72,7 +73,11 @@ class ApplicantView(QWidget):
         self.applicantTabPanel = ApplicantTabPanel(
             self.activeApplicant, self.applicantBox, self)
         self.createBox = createBox(self)
-        self.createPanel = CreatePanel(self.createBox, self, self.activeApplicant)
+        self.createPanel = CreatePanel(
+            self.createBox, self, self.activeApplicant)
+        self.editTaskPanel = AddTaskPanel(
+            self.createBox, self, self.activeApplicant, editMode=True)
+        self.editTaskPanel.setHidden(True)
 
         self.updateInterface()
 
@@ -101,6 +106,9 @@ class ApplicantView(QWidget):
             f"{self.index + 1} / {len(self.appList)}")
         self.activeApplicant = self.appList[self.index]
         self.applicantBox.setTitle(self.activeApplicant.name)
+        self.createBox.setTitle("Add")
+        self.createPanel.setHidden(False)
+        self.editTaskPanel.setHidden(True)
 
         if self.activeApplicant.duplicates:
             self.applicantPanel.setHidden(True)

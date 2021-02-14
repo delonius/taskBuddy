@@ -11,7 +11,6 @@ from PyQt5.QtWidgets import (
 from highton.models import Note, Task
 
 
-
 def indexTracker(window):
     style = trackerStyle()
     tracker = QLabel("", window)
@@ -109,6 +108,9 @@ class ApplicantTabPanel(QTabWidget):
         self.applicant = applicant
         self.tabs = []
         self.addTabs()
+        self.root.createBox.setTitle("Add")
+        self.root.createPanel.setHidden(False)
+        self.root.editTaskPanel.setHidden(True)
 
     def addTabs(self):
         for dupe in self.applicant.duplicates:
@@ -119,7 +121,8 @@ class ApplicantTabPanel(QTabWidget):
         for i in range(len(self.tabs)):
             self.addTab(ApplicantPanel(self.tabs[i], self, self.root, 10),
                         self.tabs[i].createdAt.split(' ')[0])
-        self.insertTab(0, ApplicantPanel(self.applicant, self, self.root, 10), 'Active')
+        self.insertTab(0, ApplicantPanel(
+            self.applicant, self, self.root, 10), 'Active')
         self.tabs.insert(0, self.applicant)
         self.setCurrentIndex(0)
 
@@ -142,6 +145,9 @@ class ApplicantTabPanel(QTabWidget):
         self.root.setNoteWidget.update(self.tabs[index])
         self.root.createPanel.addNotePanel.update(self.tabs[index])
         self.root.createPanel.addTaskPanel.update(self.tabs[index])
+        self.root.createBox.setTitle("Add")
+        self.root.createPanel.setHidden(False)
+        self.root.editTaskPanel.setHidden(True)
         self.parent.setTitle(self.tabs[index].name)
 
 
@@ -183,6 +189,9 @@ class ApplicantPanel(QWidget):
         self.root.setNoteWidget.update(self.applicant)
         self.root.createPanel.addNotePanel.update(self.applicant)
         self.root.createPanel.addTaskPanel.update(self.applicant)
+        self.root.createBox.setTitle("Add")
+        self.root.createPanel.setHidden(False)
+        self.root.editTaskPanel.setHidden(True)
 
     def addLabels(self):
         labels = []
@@ -260,55 +269,112 @@ def gatewayButton(parent, y):
 
 
 class TaskPanel(QTreeWidget):
-    def __init__(self, parent, applicant):
+    def __init__(self, parent, root, applicant):
         super().__init__(parent)
         style = taskPanelStyle()
+        self.root = root
         self.setGeometry(10, 30, 348, 190)
         self.setStyleSheet(style)
         self.setAlternatingRowColors(True)
         self.setRootIsDecorated(False)
         self.applicant = applicant
         self.config = Config.getInstance()
-        self.setHeaderLabels(['User', 'Due', 'Task'])
-        self.setColumnWidth(0, 35)
-        self.setColumnWidth(1, 100)
+        self.setHeaderLabels(['index', 'User', 'Due', 'Task'])
+        self.setColumnHidden(0, True)
+        self.setColumnWidth(1, 35)
+        self.setColumnWidth(2, 100)
+        self.itemDoubleClicked.connect(self.setEditTask)
 
         self.update(self.applicant)
-
 
     def update(self, applicant):
         self.applicant = applicant
         self.clear()
 
-        for task in self.applicant.newTasks[::-1]:
-            if str(task.author_id) in self.config.users:
-                abbrev = self.config.users[str(task.author_id)]['abbrev']
+        for task in self.applicant.newTasks[::-1] + self.applicant.changedTasks[::-1]:
+            if str(task.owner_id) in self.config.users:
+                abbrev = self.config.users[str(task.owner_id)]['abbrev']
                 dueAtRaw = datetime.fromisoformat(str(task.due_at))
                 dueAt = dueAtRaw.strftime(f"%m/%d-%#I%p")
                 categoryId = task.category_id
+                index = None
+                if task in self.applicant.newTasks:
+                    index = "new " + str(self.applicant.newTasks.index(task))
+                elif task in self.applicant.changedTasks:
+                    index = "changed " + \
+                        str(self.applicant.changedTasks.index(task))
                 task = QTreeWidgetItem(
-                    self, [abbrev, dueAt, task.body])
+                    self, [index, abbrev, dueAt, task.body])
                 if categoryId:
-                    task.setBackground(2, QColor(self.config.taskCategories[str(categoryId)]['color']))
-                    task.setForeground(2, QColor('white'))
+                    task.setBackground(
+                        3, QColor(self.config.taskCategories[str(categoryId)]['color']))
+                    task.setForeground(3, QColor('white'))
                 fontFormat = QFont()
                 fontFormat.setWeight(QFont.Bold)
-                task.setFont(0, fontFormat)
                 task.setFont(1, fontFormat)
                 task.setFont(2, fontFormat)
-                
+                task.setFont(3, fontFormat)
 
         for task in self.applicant.existingTasks:
-            if str(task.author_id) in self.config.users:
-                abbrev = self.config.users[str(task.author_id)]['abbrev']
-                dueAtRaw = datetime.fromisoformat(str(task.due_at)) + timedelta(hours=-5)
+            if str(task.owner_id) in self.config.users:
+                abbrev = self.config.users[str(task.owner_id)]['abbrev']
+                dueAtRaw = datetime.fromisoformat(
+                    str(task.due_at)) + timedelta(hours=-5)
                 dueAt = dueAtRaw.strftime(f"%m/%d-%#I%p")
                 categoryId = task.category_id
+                index = "existing " + \
+                    str(self.applicant.existingTasks.index(task))
                 task = QTreeWidgetItem(
-                    self, [abbrev, dueAt, task.body])
+                    self, [index, abbrev, dueAt, task.body])
                 if categoryId:
-                    task.setBackground(2, QColor(self.config.taskCategories[str(categoryId)]['color']))
-                    task.setForeground(2, QColor('white'))
+                    task.setBackground(
+                        3, QColor(self.config.taskCategories[str(categoryId)]['color']))
+                    task.setForeground(3, QColor('white'))
+
+    def setEditTask(self, item, n):
+        taskList = item.data(0, 0).split(' ')[0]
+        index = int(item.data(0, 0).split(' ')[1])
+        task = None
+        if taskList == 'new':
+            task = self.applicant.newTasks[index]
+            #task.due_at = task.due_at + timedelta(hours=-5)
+        elif taskList == 'changed':
+            task = self.applicant.changedTasks[index]
+            #task.due_at = task.due_at + timedelta(hours=-5)
+        elif taskList == 'existing':
+            task = self.applicant.existingTasks[index]
+            task.due_at = task.due_at + timedelta(hours=-5)
+
+        self.root.editTaskPanel.setEditTask(task)
+
+        editTaskPanel = self.root.editTaskPanel
+        self.root.createBox.setTitle("Edit Task")
+        self.root.createPanel.setHidden(True)
+        editTaskPanel.setHidden(False)
+        userIndex = 0
+        typeIndex = 0
+
+        if task.owner_id != self.config.id:
+            userIndex = editTaskPanel.userBox.findText(
+                self.config.users[str(task.owner_id)]['name'])
+
+        if task.category_id:
+            typeIndex = editTaskPanel.typeBox.findText(
+                self.config.taskCategories[str(task.category_id)]['name'])
+        daysIndex = editTaskPanel.daysBox.findText(
+            str(task.due_at.day - datetime.now().day))
+        hours = task.due_at.strftime("%#I")
+        amPmIndex = 0
+        if task.due_at.strftime("%p") == 'PM':
+            amPmIndex = 1
+        hoursIndex = editTaskPanel.hoursBox.findText(hours)
+
+        editTaskPanel.taskInput.setPlainText(task.body)
+        editTaskPanel.userBox.setCurrentIndex(userIndex)
+        editTaskPanel.typeBox.setCurrentIndex(typeIndex)
+        editTaskPanel.daysBox.setCurrentIndex(daysIndex)
+        editTaskPanel.hoursBox.setCurrentIndex(hoursIndex)
+        editTaskPanel.amPmBox.setCurrentIndex(amPmIndex)
 
 
 class NotePanel(QTreeWidget):
@@ -321,12 +387,12 @@ class NotePanel(QTreeWidget):
         self.setRootIsDecorated(False)
         self.applicant = applicant
         self.config = Config.getInstance()
-        self.setHeaderLabels(['User', 'Date', 'Note'])
-        self.setColumnWidth(0, 35)
+        self.setHeaderLabels(['index', 'User', 'Date', 'Note'])
+        self.setColumnHidden(0, True)
         self.setColumnWidth(1, 35)
+        self.setColumnWidth(2, 35)
 
         self.update(self.applicant)
-
 
     def update(self, applicant):
         self.applicant = applicant
@@ -337,28 +403,29 @@ class NotePanel(QTreeWidget):
             createdAtRaw = note.created_at
             createdAt = createdAtRaw.strftime(f"%#m/%#d")
             body = note.body.replace('\n', ' ')
+            index = str(self.applicant.newNotes.index(note))
             if str(note.author_id) in self.config.users:
                 abbrev = self.config.users[str(note.author_id)]['abbrev']
-            if not 'leadUuid' in note.body:  
+            if not 'leadUuid' in note.body:
                 note = QTreeWidgetItem(
-                    self, [abbrev, createdAt, body])
+                    self, [index, abbrev, createdAt, body])
                 fontFormat = QFont()
                 fontFormat.setWeight(QFont.Bold)
-                note.setFont(0, fontFormat)
                 note.setFont(1, fontFormat)
                 note.setFont(2, fontFormat)
+                note.setFont(3, fontFormat)
 
         for note in self.applicant.existingNotes:
             abbrev = ''
             createdAtRaw = note.created_at
             createdAt = createdAtRaw.strftime(f"%#m/%#d")
             body = note.body.replace('\n', ' ')
+            index = str(self.applicant.existingNotes.index(note))
             if str(note.author_id) in self.config.users:
                 abbrev = self.config.users[str(note.author_id)]['abbrev']
-            if not 'leadUuid' in note.body:  
+            if not 'leadUuid' in note.body:
                 note = QTreeWidgetItem(
-                    self, [abbrev, createdAt, body])
-
+                    self, [index, abbrev, createdAt, body])
 
 
 class CreatePanel(QTabWidget):
@@ -377,75 +444,94 @@ class CreatePanel(QTabWidget):
 
 
 class AddTaskPanel(QWidget):
-    def __init__(self, parent, root, applicant):
+    def __init__(self, parent, root, applicant, editMode=False):
         super().__init__(parent)
         self.applicant = applicant
         self.root = root
+        self.editTask = None
+        self.editMode = editMode
         self.config = Config.getInstance()
         self.addWidgets()
         self.populateFields()
 
-    
+    def setEditTask(self, task):
+        self.editTask = task
+
     def addWidgets(self):
+        y = 0
+        x = 0
+        if self.editMode:
+            y = 56
+            x = 2
         self.taskLabel = QLabel("Task: ", self)
-        self.taskLabel.setGeometry(20, 10, 50, 30)
-        self.taskLabel.setStyleSheet("font-family: Helvetica; font-weight: bold;")
+        self.taskLabel.setGeometry(20 + x, 10 + y, 50, 30)
+        self.taskLabel.setStyleSheet(
+            "font-family: Helvetica; font-weight: bold;")
 
         self.userLabel = QLabel("User: ", self)
-        self.userLabel.setGeometry(20, 50, 50, 30)
-        self.userLabel.setStyleSheet("font-family: Helvetica; font-weight: bold;")
+        self.userLabel.setGeometry(20 + x, 50 + y, 50, 30)
+        self.userLabel.setStyleSheet(
+            "font-family: Helvetica; font-weight: bold;")
 
         self.typeLabel = QLabel("Type: ", self)
-        self.typeLabel.setGeometry(200, 50, 50, 30)
-        self.typeLabel.setStyleSheet("font-family: Helvetica; font-weight: bold;")
+        self.typeLabel.setGeometry(200 + x, 50 + y, 50, 30)
+        self.typeLabel.setStyleSheet(
+            "font-family: Helvetica; font-weight: bold;")
 
         self.dueAtLabel = QLabel("When: ", self)
-        self.dueAtLabel.setGeometry(20, 90, 50, 30)
-        self.dueAtLabel.setStyleSheet("font-family: Helvetica; font-weight: bold;")
+        self.dueAtLabel.setGeometry(20 + x, 90 + y, 50, 30)
+        self.dueAtLabel.setStyleSheet(
+            "font-family: Helvetica; font-weight: bold;")
 
         self.dueAtInfoLabel = QLabel("days, at ", self)
-        self.dueAtInfoLabel.setGeometry(135, 90, 100, 30)
-        self.dueAtInfoLabel.setStyleSheet("font-family: Helvetica; font-weight: bold;")
+        self.dueAtInfoLabel.setGeometry(135 + x, 90 + y, 100, 30)
+        self.dueAtInfoLabel.setStyleSheet(
+            "font-family: Helvetica; font-weight: bold;")
 
         self.inputBoxStyle = inputBoxStyle()
         self.taskInput = QPlainTextEdit(self)
-        self.taskInput.setGeometry(70, 13, 280, 30)
+        self.taskInput.setGeometry(70 + x, 13 + y, 280, 30)
         self.taskInput.setStyleSheet(self.inputBoxStyle)
 
         self.userBox = QComboBox(self)
-        self.userBox.setGeometry(70, 53, 120, 30)
+        self.userBox.setGeometry(70 + x, 53 + y, 120, 30)
 
         self.typeBox = QComboBox(self)
-        self.typeBox.setGeometry(250, 53, 100, 30)
+        self.typeBox.setGeometry(250 + x, 53 + y, 100, 30)
 
         self.daysBox = QComboBox(self)
-        self.daysBox.setGeometry(70, 93, 60, 30)
+        self.daysBox.setGeometry(70 + x, 93 + y, 60, 30)
 
         self.hoursBox = QComboBox(self)
-        self.hoursBox.setGeometry(200, 93, 60, 30)
+        self.hoursBox.setGeometry(200 + x, 93 + y, 60, 30)
 
         self.amPmBox = QComboBox(self)
-        self.amPmBox.setGeometry(270, 93, 60, 30)
+        self.amPmBox.setGeometry(270 + x, 93 + y, 60, 30)
 
-        self.addButton = QPushButton("Add Task", self)
-        self.addButton.setGeometry(125, 135, 120, 30)
-        self.addButton.setStyleSheet(gatewayButtonStyle())
-        self.addButton.clicked.connect(self.addTask)
+        if not self.editTask:
+            self.addButton = QPushButton("Add Task", self)
+            self.addButton.setGeometry(125 + x, 135 + y, 120, 30)
+            self.addButton.setStyleSheet(gatewayButtonStyle())
+            self.addButton.clicked.connect(self.addTask)
+        else:
+            self.addButton = QPushButton("Save Task", self)
+            self.addButton.setGeometry(92 + x, 135 + y, 120, 30)
+            self.addButton.setStyleSheet(gatewayButtonStyle())
+            self.addButton.clicked.connect(self.addTask)
 
-    
     def populateFields(self):
         self.userBox.addItems(['Me'])
         for user, value in self.config.users.items():
             if not user == str(self.config.id):
                 name = value['name']
                 self.userBox.addItems([name])
-        
+
         self.typeBox.addItems(['None'])
         for category, value in self.config.taskCategories.items():
             name = value['name']
             self.typeBox.addItems([name])
 
-        for i in range(1,31):
+        for i in range(1, 31):
             self.daysBox.addItems([str(i)])
 
         for i in range(1, 13):
@@ -454,10 +540,8 @@ class AddTaskPanel(QWidget):
 
         self.amPmBox.addItems(['AM', 'PM'])
 
-
     def update(self, applicant):
         self.applicant = applicant
-
 
     def addTask(self):
         body = self.taskInput.toPlainText()
@@ -479,21 +563,56 @@ class AddTaskPanel(QWidget):
                 if value['name'] == self.typeBox.currentText():
                     category = key
             if category:
-                task.category_id = category 
+                task.category_id = category
             task.due_at = dueAt
-            authorId = self.config.id
+            ownerId = self.config.id
             for key, value in self.config.users.items():
                 if self.userBox.currentText() == value['name']:
-                    authorId = key
-            task.author_id = authorId
-            self.applicant.newTasks.append(task)
-            self.root.setTaskWidget.update(self.applicant)
-            self.taskInput.setPlainText("")
-            self.userBox.setCurrentIndex(0)
-            self.typeBox.setCurrentIndex(0)
-            self.daysBox.setCurrentIndex(0)
-            self.hoursBox.setCurrentIndex(7)
-            self.amPmBox.setCurrentIndex(0)
+                    ownerId = key
+            task.owner_id = ownerId
+
+            if self.editTask:
+                unchanged = True
+                if not self.editTask.body == task.body:
+                    unchanged = False
+                if not str(self.editTask.owner_id) == str(task.owner_id):
+                    unchanged = False
+                if not str(self.editTask.due_at) == str(task.due_at):
+                    unchanged = False
+                if not unchanged:
+                    if self.editTask in self.applicant.existingTasks:
+                        task.id = self.editTask.id
+                        task.due_at = task.due_at + timedelta(hours=5)
+                        self.applicant.existingTasks.remove(self.editTask)
+                        self.applicant.changedTasks.append(task)
+                    elif self.editTask in self.applicant.newTasks:
+                        self.applicant.newTasks.remove(self.editTask)
+                        self.applicant.newTasks.append(task)
+                    elif self.editTask in self.applicant.changedTasks:
+                        self.applicant.changedTasks.remove(self.editTask)
+                        self.applicant.changedTasks.append(task)
+                    self.root.setTaskWidget.update(self.applicant)
+                else:
+                    self.editTask.due_at = task.due_at + timedelta(hours=5)
+                self.root.createPanel.setHidden(False)
+                self.root.editTaskPanel.setHidden(True)
+                self.root.setTaskWidget.update(self.applicant)
+                self.root.applicantTabPanel.updateData()
+                self.root.createBox.setTitle("Add")
+                self.editTask = None
+                self.resetInterface()
+            else:
+                self.applicant.newTasks.append(task)
+                self.root.setTaskWidget.update(self.applicant)
+                self.resetInterface()
+
+    def resetInterface(self):
+        self.taskInput.setPlainText("")
+        self.userBox.setCurrentIndex(0)
+        self.typeBox.setCurrentIndex(0)
+        self.daysBox.setCurrentIndex(0)
+        self.hoursBox.setCurrentIndex(7)
+        self.amPmBox.setCurrentIndex(0)
 
 
 class AddNotePanel(QWidget):

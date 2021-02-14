@@ -101,6 +101,7 @@ class Applicant():
         self.existingNotes = []
         self.newTasks = []
         self.newNotes = []
+        self.changedTasks = []
 
         if len(self.phone) == 10:
             self.phone = '(' + self.phone[0:3] + ') ' + \
