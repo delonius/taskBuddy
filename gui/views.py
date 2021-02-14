@@ -64,6 +64,9 @@ class ApplicantView(QWidget):
         self.indexTracker = indexTracker(self)
         self.applicantBox = applicantGroupBox(self)
         self.taskBox = taskBox(self)
+        self.createBox = createBox(self)
+        self.editTaskPanel = AddTaskPanel(
+            self.createBox, self, self.activeApplicant, editMode=True)
         self.setTaskWidget = TaskPanel(
             self.taskBox, self, self.activeApplicant)
         self.noteBox = noteBox(self)
@@ -72,11 +75,8 @@ class ApplicantView(QWidget):
             self.activeApplicant, self.applicantBox, self)
         self.applicantTabPanel = ApplicantTabPanel(
             self.activeApplicant, self.applicantBox, self)
-        self.createBox = createBox(self)
         self.createPanel = CreatePanel(
             self.createBox, self, self.activeApplicant)
-        self.editTaskPanel = AddTaskPanel(
-            self.createBox, self, self.activeApplicant, editMode=True)
         self.editTaskPanel.setHidden(True)
 
         self.updateInterface()

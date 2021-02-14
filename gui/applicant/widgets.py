@@ -145,6 +145,7 @@ class ApplicantTabPanel(QTabWidget):
         self.root.setNoteWidget.update(self.tabs[index])
         self.root.createPanel.addNotePanel.update(self.tabs[index])
         self.root.createPanel.addTaskPanel.update(self.tabs[index])
+        self.root.editTaskPanel.update(self.tabs[index])
         self.root.createBox.setTitle("Add")
         self.root.createPanel.setHidden(False)
         self.root.editTaskPanel.setHidden(True)
@@ -290,8 +291,12 @@ class TaskPanel(QTreeWidget):
     def update(self, applicant):
         self.applicant = applicant
         self.clear()
+        self.root.editTaskPanel.update(self.applicant)
 
-        for task in self.applicant.newTasks[::-1] + self.applicant.changedTasks[::-1]:
+        newChangedTasks = self.applicant.newTasks + self.applicant.changedTasks
+        newChangedTasks.sort(key=lambda task: task.due_at, reverse=False)
+
+        for task in newChangedTasks:
             if str(task.owner_id) in self.config.users:
                 abbrev = self.config.users[str(task.owner_id)]['abbrev']
                 dueAtRaw = datetime.fromisoformat(str(task.due_at))
@@ -318,9 +323,7 @@ class TaskPanel(QTreeWidget):
         for task in self.applicant.existingTasks:
             if str(task.owner_id) in self.config.users:
                 abbrev = self.config.users[str(task.owner_id)]['abbrev']
-                dueAtRaw = datetime.fromisoformat(
-                    str(task.due_at)) + timedelta(hours=-5)
-                dueAt = dueAtRaw.strftime(f"%m/%d-%#I%p")
+                dueAt = task.due_at.strftime(f"%m/%d-%#I%p")
                 categoryId = task.category_id
                 index = "existing " + \
                     str(self.applicant.existingTasks.index(task))
@@ -334,16 +337,15 @@ class TaskPanel(QTreeWidget):
     def setEditTask(self, item, n):
         taskList = item.data(0, 0).split(' ')[0]
         index = int(item.data(0, 0).split(' ')[1])
+        self.root.editTaskPanel.update(self.applicant)
         task = None
         if taskList == 'new':
             task = self.applicant.newTasks[index]
-            #task.due_at = task.due_at + timedelta(hours=-5)
         elif taskList == 'changed':
             task = self.applicant.changedTasks[index]
-            #task.due_at = task.due_at + timedelta(hours=-5)
         elif taskList == 'existing':
             task = self.applicant.existingTasks[index]
-            task.due_at = task.due_at + timedelta(hours=-5)
+            task.due_at = task.due_at
 
         self.root.editTaskPanel.setEditTask(task)
 
@@ -579,10 +581,11 @@ class AddTaskPanel(QWidget):
                     unchanged = False
                 if not str(self.editTask.due_at) == str(task.due_at):
                     unchanged = False
+                if not str(self.editTask.category_id) == str(task.category_id):
+                    unchanged = False
                 if not unchanged:
                     if self.editTask in self.applicant.existingTasks:
                         task.id = self.editTask.id
-                        task.due_at = task.due_at + timedelta(hours=5)
                         self.applicant.existingTasks.remove(self.editTask)
                         self.applicant.changedTasks.append(task)
                     elif self.editTask in self.applicant.newTasks:
@@ -592,18 +595,20 @@ class AddTaskPanel(QWidget):
                         self.applicant.changedTasks.remove(self.editTask)
                         self.applicant.changedTasks.append(task)
                     self.root.setTaskWidget.update(self.applicant)
-                else:
-                    self.editTask.due_at = task.due_at + timedelta(hours=5)
+                    self.root.applicantPanel.update(self.applicant)
+                    self.resetInterface()
                 self.root.createPanel.setHidden(False)
                 self.root.editTaskPanel.setHidden(True)
                 self.root.setTaskWidget.update(self.applicant)
                 self.root.applicantTabPanel.updateData()
                 self.root.createBox.setTitle("Add")
                 self.editTask = None
+                self.root.applicantPanel.update(self.applicant)
                 self.resetInterface()
             else:
                 self.applicant.newTasks.append(task)
                 self.root.setTaskWidget.update(self.applicant)
+                self.root.applicantPanel.update(self.applicant)
                 self.resetInterface()
 
     def resetInterface(self):
