@@ -226,7 +226,7 @@ class ApplicantPanel(QWidget):
         values['createdAt'] = QLabel(self.applicant.createdAt, self)
 
         for value in values.values():
-            value.setGeometry(95, y, 270, 20)
+            value.setGeometry(95, y, 274, 20)
             value.setStyleSheet(style)
             value.setTextInteractionFlags(Qt.TextSelectableByMouse)
             y = y + 30
@@ -510,7 +510,7 @@ class AddTaskPanel(QWidget):
         self.amPmBox = QComboBox(self)
         self.amPmBox.setGeometry(270 + x, 93 + y, 60, 30)
 
-        if not self.editTask:
+        if not self.editMode:
             self.addButton = QPushButton("Add Task", self)
             self.addButton.setGeometry(125 + x, 135 + y, 120, 30)
             self.addButton.setStyleSheet(gatewayButtonStyle())
