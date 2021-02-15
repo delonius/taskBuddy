@@ -610,6 +610,8 @@ class AddTaskPanel(QWidget):
                 self.root.setTaskWidget.update(self.applicant)
                 self.root.applicantPanel.update(self.applicant)
                 self.resetInterface()
+            if self.root.applicantTabPanel.isHidden():
+                self.root.updateInterface()
 
     def resetInterface(self):
         self.taskInput.setPlainText("")

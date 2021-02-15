@@ -107,6 +107,7 @@ class ApplicantView(QWidget):
         self.activeApplicant = self.appList[self.index]
         self.applicantBox.setTitle(self.activeApplicant.name)
         self.createBox.setTitle("Add")
+        self.editTaskPanel.update(self.activeApplicant)
         self.createPanel.setHidden(False)
         self.editTaskPanel.setHidden(True)
 
