@@ -409,13 +409,15 @@ class NotePanel(QTreeWidget):
             if str(note.author_id) in self.config.users:
                 abbrev = self.config.users[str(note.author_id)]['abbrev']
             if not 'leadUuid' in note.body:
-                note = QTreeWidgetItem(
+                noteItem = QTreeWidgetItem(
                     self, [index, abbrev, createdAt, body])
                 fontFormat = QFont()
                 fontFormat.setWeight(QFont.Bold)
-                note.setFont(1, fontFormat)
-                note.setFont(2, fontFormat)
-                note.setFont(3, fontFormat)
+                noteItem.setFont(1, fontFormat)
+                noteItem.setFont(2, fontFormat)
+                noteItem.setFont(3, fontFormat)
+                tooltip = tooltip = f"{createdAtRaw.strftime('%#m/%#d/%Y')} || {note.body}"
+                noteItem.setToolTip(3, tooltip)
 
         for note in self.applicant.existingNotes:
             abbrev = ''
@@ -426,8 +428,10 @@ class NotePanel(QTreeWidget):
             if str(note.author_id) in self.config.users:
                 abbrev = self.config.users[str(note.author_id)]['abbrev']
             if not 'leadUuid' in note.body:
-                note = QTreeWidgetItem(
+                noteItem = QTreeWidgetItem(
                     self, [index, abbrev, createdAt, body])
+                tooltip = f"{createdAtRaw.strftime('%#m/%#d/%Y')} || {note.body}"
+                noteItem.setToolTip(3, tooltip)
 
 
 class CreatePanel(QTabWidget):
