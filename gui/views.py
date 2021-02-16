@@ -50,13 +50,14 @@ class ApplicantTabView(QTabWidget):
 
         for key, value in sortedApps.items():
             if len(value) > 0:
-                self.addTab(ApplicantView(value), f"{key} - {len(value)}")
+                self.addTab(ApplicantView(value, self.app), f"{key} - {len(value)}")
 
 
 class ApplicantView(QWidget):
-    def __init__(self, appList):
+    def __init__(self, appList, app):
         super().__init__()
         self.appList = appList
+        self.app = app
         self.index = 0
         self.activeApplicant = self.appList[self.index]
         self.nextButton = nextButton(self)

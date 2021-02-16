@@ -34,6 +34,10 @@ class MainWindow(QStackedWidget):
 
         if type == 'warning':
             msg.setIcon(QMessageBox.Warning)
+        elif type == 'deleteWarning':
+            msg.setIcon(QMessageBox.Warning)
+            msg.addButton(QMessageBox.Yes)
+            msg.addButton(QMessageBox.Cancel)
         else:
             msg.setIcon(QMessageBox.Information)
         msg.show()

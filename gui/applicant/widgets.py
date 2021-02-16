@@ -521,9 +521,14 @@ class AddTaskPanel(QWidget):
             self.addButton.clicked.connect(self.addTask)
         else:
             self.addButton = QPushButton("Save Task", self)
-            self.addButton.setGeometry(92 + x, 135 + y, 120, 30)
+            self.addButton.setGeometry(47 + x, 135 + y, 120, 30)
             self.addButton.setStyleSheet(gatewayButtonStyle())
             self.addButton.clicked.connect(self.addTask)
+
+            self.deleteButton = QPushButton("Delete Task", self)
+            self.deleteButton.setGeometry(195 + x, 135 + y, 120, 30)
+            self.deleteButton.setStyleSheet(deleteButtonStyle())
+            self.deleteButton.clicked.connect(self.deleteTask)
 
     def populateFields(self):
         self.userBox.addItems(['Me'])
@@ -616,6 +621,23 @@ class AddTaskPanel(QWidget):
                 self.resetInterface()
             if self.root.applicantTabPanel.isHidden():
                 self.root.updateInterface()
+
+    def deleteTask(self):
+        task = self.editTask
+        self.root.app.displayMessage("Warning", "Are you sure you want to delete this task?", "deleteWarning")
+
+        if task in self.applicant.newTasks:
+            self.applicant.newTasks.remove(task)
+        if task in self.applicant.existingTasks:
+            self.applicant.existingTasks.remove(task)
+        if task in self.applicant.changedTasks:
+            self.applicant.changedTasks.remove(task)
+        
+        self.applicant.deleteTasks.append(task)
+        self.root.setTaskWidget.update(self.applicant)
+        self.root.createPanel.setHidden(False)
+        self.root.editTaskPanel.setHidden(True)
+        print([task.body for task in self.applicant.deleteTasks])
 
     def resetInterface(self):
         self.taskInput.setPlainText("")

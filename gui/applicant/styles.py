@@ -122,6 +122,24 @@ def gatewayButtonStyle():
             }
             """
 
+def deleteButtonStyle():
+    return """
+            QPushButton {
+                font-size: 16px;
+                background-color: #ff616a;
+                border: 2px solid #888888;
+                border-radius: 10px;
+                font-family: Helvetica;
+                font-weight: bold;
+            }
+            QPushButton:hover {
+                background-color: #f5222e;
+            }
+            QPushButton:pressed {
+                background-color: #d41e29;
+            }
+            """
+
 
 def applicantTabPanelStyle():
     return """
