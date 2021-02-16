@@ -150,7 +150,6 @@ class Applicant():
             task.due_at = task.due_at + timedelta(hours=-5)
 
     def addToGroup(self, applicants):
-        applicants = applicants
         tags = []
         if self.applicant.tags:
             tags = [tag.name for tag in self.applicant.tags]

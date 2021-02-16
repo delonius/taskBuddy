@@ -89,6 +89,24 @@ def createBox(window):
     return createBox
 
 
+def highriseButton(parent, y):
+    style = highriseButtonStyle()
+    highriseButton = QPushButton("Highrise", parent)
+    highriseButton.setGeometry(50, y + 185, 120, 30)
+    highriseButton.setStyleSheet(style)
+
+    return highriseButton
+
+
+def gatewayButton(parent, y):
+    style = gatewayButtonStyle()
+    gatewayButton = QPushButton("Gateway", parent)
+    gatewayButton.setGeometry(210, y + 185, 120, 30)
+    gatewayButton.setStyleSheet(style)
+
+    return gatewayButton
+
+
 class ApplicantTabPanel(QTabWidget):
     def __init__(self, applicant, parent, root):
         super().__init__(parent)
@@ -101,7 +119,7 @@ class ApplicantTabPanel(QTabWidget):
         self.setGeometry(0, 25, 382, 265)
         style = applicantTabPanelStyle()
         self.setStyleSheet(style)
-        self.currentChanged.connect(self.updateData)
+        self.currentChanged.connect(self.syncData)
 
     def update(self, applicant):
         self.clear()
@@ -139,7 +157,7 @@ class ApplicantTabPanel(QTabWidget):
             tmp[index] = dupe
         return tmp
 
-    def updateData(self):
+    def syncData(self):
         index = self.currentIndex()
         self.root.setTaskWidget.update(self.tabs[index])
         self.root.setNoteWidget.update(self.tabs[index])
@@ -249,24 +267,6 @@ class ApplicantPanel(QWidget):
             self.gatewayButton.clicked.connect(
                 lambda: bindGatewayButton(self.applicant))
             self.gatewayButton.setText("Gateway")
-
-
-def highriseButton(parent, y):
-    style = highriseButtonStyle()
-    highriseButton = QPushButton("Highrise", parent)
-    highriseButton.setGeometry(50, y + 185, 120, 30)
-    highriseButton.setStyleSheet(style)
-
-    return highriseButton
-
-
-def gatewayButton(parent, y):
-    style = gatewayButtonStyle()
-    gatewayButton = QPushButton("Gateway", parent)
-    gatewayButton.setGeometry(210, y + 185, 120, 30)
-    gatewayButton.setStyleSheet(style)
-
-    return gatewayButton
 
 
 class TaskPanel(QTreeWidget):
@@ -633,7 +633,7 @@ class AddTaskPanel(QWidget):
                 self.root.createPanel.setHidden(False)
                 self.root.editTaskPanel.setHidden(True)
                 self.root.setTaskWidget.update(self.applicant)
-                self.root.applicantTabPanel.updateData()
+                self.root.applicantTabPanel.syncData()
                 self.root.createBox.setTitle("Add")
                 self.editTask = None
                 self.root.applicantPanel.update(self.applicant)
