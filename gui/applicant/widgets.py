@@ -630,10 +630,11 @@ class AddTaskPanel(QWidget):
             self.applicant.newTasks.remove(task)
         if task in self.applicant.existingTasks:
             self.applicant.existingTasks.remove(task)
+            self.applicant.deleteTasks.append(task)
         if task in self.applicant.changedTasks:
             self.applicant.changedTasks.remove(task)
+            self.applicant.deleteTasks.append(task)
         
-        self.applicant.deleteTasks.append(task)
         self.root.setTaskWidget.update(self.applicant)
         self.root.createPanel.setHidden(False)
         self.root.editTaskPanel.setHidden(True)
