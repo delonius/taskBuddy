@@ -3,10 +3,10 @@ from gui.util import Config
 from gui.applicant.styles import *
 from gui.applicant.actions import *
 from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QColor, QFont, QTextCharFormat
+from PyQt5.QtGui import QColor, QFont, QTextCharFormat, QIcon
 from PyQt5.QtWidgets import (
     QLabel, QPushButton, QGroupBox, QFormLayout, QWidget, QTabWidget,
-    QTreeWidget, QTreeWidgetItem, QHeaderView, QPlainTextEdit, QComboBox
+    QTreeWidget, QTreeWidgetItem, QHeaderView, QPlainTextEdit, QComboBox, QMessageBox
 )
 from highton.models import Note, Task
 
@@ -388,11 +388,13 @@ class NotePanel(QTreeWidget):
         self.setAlternatingRowColors(True)
         self.setRootIsDecorated(False)
         self.applicant = applicant
+        self.deletingNote = None
         self.config = Config.getInstance()
         self.setHeaderLabels(['index', 'User', 'Date', 'Note'])
         self.setColumnHidden(0, True)
         self.setColumnWidth(1, 35)
         self.setColumnWidth(2, 35)
+        self.itemDoubleClicked.connect(self.setDeleteNote)
 
         self.update(self.applicant)
 
@@ -405,7 +407,7 @@ class NotePanel(QTreeWidget):
             createdAtRaw = note.created_at
             createdAt = createdAtRaw.strftime(f"%#m/%#d")
             body = note.body.replace('\n', ' ')
-            index = str(self.applicant.newNotes.index(note))
+            index = "new " + str(self.applicant.newNotes.index(note))
             if str(note.author_id) in self.config.users:
                 abbrev = self.config.users[str(note.author_id)]['abbrev']
             if not 'leadUuid' in note.body:
@@ -424,7 +426,7 @@ class NotePanel(QTreeWidget):
             createdAtRaw = note.created_at
             createdAt = createdAtRaw.strftime(f"%#m/%#d")
             body = note.body.replace('\n', ' ')
-            index = str(self.applicant.existingNotes.index(note))
+            index = "exiting " + str(self.applicant.existingNotes.index(note))
             if str(note.author_id) in self.config.users:
                 abbrev = self.config.users[str(note.author_id)]['abbrev']
             if not 'leadUuid' in note.body:
@@ -432,6 +434,28 @@ class NotePanel(QTreeWidget):
                     self, [index, abbrev, createdAt, body])
                 tooltip = f"{createdAtRaw.strftime('%#m/%#d/%Y')} || {note.body}"
                 noteItem.setToolTip(3, tooltip)
+
+    def setDeleteNote(self, item, n):
+        noteList = item.data(0, 0).split(' ')[0]
+        index = int(item.data(0, 0).split(' ')[1])
+        if noteList == "new":
+            self.deletingNote = self.applicant.newNotes[index]
+            msg = QMessageBox()
+            msg.setText("Are you sure you want to delete this note?")
+            msg.setWindowTitle("Warning")
+            msg.setWindowIcon(QIcon('static/icon.png'))
+            msg.setIcon(QMessageBox.Warning)
+            msg.addButton(QMessageBox.Yes)
+            msg.addButton(QMessageBox.Cancel)
+            msg.setDefaultButton(QMessageBox.Cancel)
+            msg.buttonClicked.connect(self.deleteNote)
+            msg.exec_()
+
+    def deleteNote(self, i):
+        if i.text() == '&Yes':
+            self.applicant.newNotes.remove(self.deletingNote)
+            self.deletingNote = None
+            self.update(self.applicant)
 
 
 class CreatePanel(QTabWidget):
@@ -528,7 +552,7 @@ class AddTaskPanel(QWidget):
             self.deleteButton = QPushButton("Delete Task", self)
             self.deleteButton.setGeometry(195 + x, 135 + y, 120, 30)
             self.deleteButton.setStyleSheet(deleteButtonStyle())
-            self.deleteButton.clicked.connect(self.deleteTask)
+            self.deleteButton.clicked.connect(self.deletePrompt)
 
     def populateFields(self):
         self.userBox.addItems(['Me'])
@@ -622,23 +646,34 @@ class AddTaskPanel(QWidget):
             if self.root.applicantTabPanel.isHidden():
                 self.root.updateInterface()
 
-    def deleteTask(self):
-        task = self.editTask
-        self.root.app.displayMessage("Warning", "Are you sure you want to delete this task?", "deleteWarning")
+    def deletePrompt(self):
+        msg = QMessageBox()
+        msg.setText("Are you sure you want to delete this task?")
+        msg.setWindowTitle("Warning")
+        msg.setWindowIcon(QIcon('static/icon.png'))
+        msg.setIcon(QMessageBox.Warning)
+        msg.addButton(QMessageBox.Yes)
+        msg.addButton(QMessageBox.Cancel)
+        msg.setDefaultButton(QMessageBox.Cancel)
+        msg.buttonClicked.connect(self.deleteTask)
+        msg.exec_()
 
-        if task in self.applicant.newTasks:
-            self.applicant.newTasks.remove(task)
-        if task in self.applicant.existingTasks:
-            self.applicant.existingTasks.remove(task)
-            self.applicant.deleteTasks.append(task)
-        if task in self.applicant.changedTasks:
-            self.applicant.changedTasks.remove(task)
-            self.applicant.deleteTasks.append(task)
-        
-        self.root.setTaskWidget.update(self.applicant)
-        self.root.createPanel.setHidden(False)
-        self.root.editTaskPanel.setHidden(True)
-        print([task.body for task in self.applicant.deleteTasks])
+    def deleteTask(self, i):
+        if i.text() == '&Yes':
+            task = self.editTask
+
+            if task in self.applicant.newTasks:
+                self.applicant.newTasks.remove(task)
+            if task in self.applicant.existingTasks:
+                self.applicant.existingTasks.remove(task)
+                self.applicant.deleteTasks.append(task)
+            if task in self.applicant.changedTasks:
+                self.applicant.changedTasks.remove(task)
+                if task.id:
+                    self.applicant.deleteTasks.append(task)
+            self.root.setTaskWidget.update(self.applicant)
+            self.root.createPanel.setHidden(False)
+            self.root.editTaskPanel.setHidden(True)
 
     def resetInterface(self):
         self.taskInput.setPlainText("")
