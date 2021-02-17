@@ -1,8 +1,12 @@
 from PyQt5.QtWidgets import QPlainTextEdit, QPushButton, QLabel, QMessageBox
 from PyQt5.QtCore import QRect, Qt
 from PyQt5.QtGui import QPixmap
-from gui.main.styles import inputBoxStyle, fetchButtonStyle, instructionLabelStyle
+from gui.main.styles import (
+    inputBoxStyle, fetchButtonStyle, instructionLabelStyle,
+    backButtonStyle, continueButtonStyle
+)
 from gui.main.actions import handleFetchClick
+from gui.applicant.actions import backButtonClick
 
 
 def inputBox(window):
@@ -57,3 +61,29 @@ def bottomRibbon(window):
     ribbon.setStyleSheet("background-color: #B5DC10")
 
     return ribbon
+
+
+def confirmationText(window):
+    text = "All done?\nClick 'Continue' to begin processing\nyour changes or 'Back' to return\nto the previous screen."
+    label = QLabel(text, window)
+    label.setGeometry(200, 150, 400, 300)
+    label.setStyleSheet(instructionLabelStyle())
+    label.setAlignment(Qt.AlignHCenter)
+
+    return label
+
+
+def backButton(window, app):
+    button = QPushButton("Back", window)
+    button.setGeometry(220, 350, 150, 75)
+    button.setStyleSheet(backButtonStyle())
+    button.clicked.connect(lambda: backButtonClick(app))
+
+    return button
+
+def continueButton(window, app):
+    button = QPushButton("Continue", window)
+    button.setGeometry(430, 350, 150, 75)
+    button.setStyleSheet(continueButtonStyle())
+
+    return button

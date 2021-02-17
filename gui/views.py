@@ -1,6 +1,9 @@
 from PyQt5.QtWidgets import QWidget, QTabWidget, QLabel
 from PyQt5.QtCore import Qt
-from gui.main.widgets import inputBox, bottomRibbon, fetchButton, instructionLabel, logo, divider
+from gui.main.widgets import (
+    inputBox, bottomRibbon, fetchButton,
+    instructionLabel, logo, divider, confirmationText, backButton, continueButton
+)
 from gui.load.widgets import progressBar, fetchLabel, nameLabel, dupesLabel, tasksLabel
 from gui.applicant.widgets import *
 from applicants import Applicants
@@ -36,7 +39,7 @@ class ApplicantTabView(QTabWidget):
         super().__init__()
         self.app = app
         self.setStyleSheet(tabsStyle())
-        self.setCornerWidget(finishButton(self), Qt.TopRightCorner)
+        self.setCornerWidget(finishButton(self, self.app), Qt.TopRightCorner)
 
     def addTabs(self):
         applicants = Applicants.getInstance()
@@ -130,3 +133,11 @@ class ApplicantView(QWidget):
             self.nextButton.setHidden(True)
         else:
             self.nextButton.setHidden(False)
+
+class FinishConfirmationView(QWidget):
+    def __init__(self, app):
+        super().__init__()
+        self.app = app
+        self.confirmationText = confirmationText(self)
+        self.backButton = backButton(self, self.app)
+        self.continueButton = continueButton(self, self.app)

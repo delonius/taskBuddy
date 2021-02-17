@@ -1,6 +1,6 @@
 from PyQt5.QtWidgets import QApplication, QWidget, QStackedWidget, QMessageBox
 from PyQt5.QtGui import QIcon, QFontDatabase
-from gui.views import MainView, LoadView, ApplicantTabView
+from gui.views import MainView, LoadView, ApplicantTabView, FinishConfirmationView
 from applicants import Applicants, ApplicantsWorker
 from gui.util import Config
 import sys
@@ -25,6 +25,7 @@ class MainWindow(QStackedWidget):
         self.mainView = self.addWidget(MainView(self))
         self.loadView = self.addWidget(LoadView(self))
         self.appView = self.addWidget(ApplicantTabView(self))
+        self.confirmationView = self.addWidget(FinishConfirmationView(self))
 
     def displayMessage(self, title, text, type=None):
         msg = QMessageBox()

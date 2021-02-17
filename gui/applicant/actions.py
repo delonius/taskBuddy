@@ -25,3 +25,10 @@ def bindGatewayButton(applicant):
 def bindFlexxportalButton(applicant):
     flexxportalUrl = f"https://app.flexxbuy.com/r/application/{applicant.loanID}/details/"
     QDesktopServices.openUrl(QUrl(flexxportalUrl))
+
+
+def loadFinishView(app):
+    app.setCurrentIndex(app.confirmationView)
+
+def backButtonClick(app):
+    app.setCurrentIndex(app.appView)

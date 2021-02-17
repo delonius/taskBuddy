@@ -42,10 +42,11 @@ def nextButton(window):
     return button
 
 
-def finishButton(window):
+def finishButton(window, app):
     style = finishButtonStyle()
     button = QPushButton("Finish", window)
     button.setStyleSheet(style)
+    button.clicked.connect(lambda: loadFinishView(app))
 
     return button
 
