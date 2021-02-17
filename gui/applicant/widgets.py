@@ -191,8 +191,13 @@ class ApplicantPanel(QWidget):
 
     def update(self, applicant):
         self.applicant = applicant
+        emailText = ""
+        if self.applicant.email == 'N/A':
+            emailText = self.applicant.email
+        else:
+            emailText = f'<a href="mailto:{self.applicant.email}">{self.applicant.email}</a>'
         self.values['loanID'].setText(self.applicant.loanID)
-        self.values['email'].setText(self.applicant.email)
+        self.values['email'].setText(emailText)
         self.values['phone'].setText(self.applicant.phone)
         if self.applicant.isReApp:
             self.values['merchant'].setText(
@@ -234,7 +239,15 @@ class ApplicantPanel(QWidget):
         y = self.y
         style = applicantPanelValueStyle()
         values['loanID'] = QLabel(self.applicant.loanID, self)
-        values['email'] = QLabel(self.applicant.email, self)
+        emailText = ""
+        if self.applicant.email == 'N/A':
+            emailText = self.applicant.email
+        else:
+            emailText = f'<a href="mailto:{self.applicant.email}">{self.applicant.email}</a>'
+        emailValue = QLabel(self)
+        emailValue.setText(emailText)
+        emailValue.setOpenExternalLinks(True)
+        values['email'] = emailValue
         values['phone'] = QLabel(self.applicant.phone, self)
         if self.applicant.isReApp:
             values['merchant'] = QLabel(
@@ -247,7 +260,8 @@ class ApplicantPanel(QWidget):
         for value in values.values():
             value.setGeometry(95, y, 274, 20)
             value.setStyleSheet(style)
-            value.setTextInteractionFlags(Qt.TextSelectableByMouse)
+            if value != values['email']:
+                value.setTextInteractionFlags(Qt.TextSelectableByMouse)
             y = y + 30
 
         self.values = values

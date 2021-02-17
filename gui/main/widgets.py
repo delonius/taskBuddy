@@ -75,7 +75,7 @@ def confirmationText(window):
 
 def backButton(window, app):
     button = QPushButton("Back", window)
-    button.setGeometry(220, 350, 150, 75)
+    button.setGeometry(220, 350, 150, 50)
     button.setStyleSheet(backButtonStyle())
     button.clicked.connect(lambda: backButtonClick(app))
 
@@ -83,7 +83,7 @@ def backButton(window, app):
 
 def continueButton(window, app):
     button = QPushButton("Continue", window)
-    button.setGeometry(430, 350, 150, 75)
+    button.setGeometry(430, 350, 150, 50)
     button.setStyleSheet(continueButtonStyle())
 
     return button

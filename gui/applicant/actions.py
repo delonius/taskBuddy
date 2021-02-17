@@ -10,7 +10,7 @@ def handleButtonNext(tab):
 def handleButtonPrev(tab):
     tab.decrementIndex()
     tab.updateInterface()
-
+    
 
 def bindHighriseButton(applicant):
     highriseUrl = f"https://flexxbuyapps.highrisehq.com/people/{applicant.highriseID}"
