@@ -581,12 +581,13 @@ class AddTaskPanel(QWidget):
             name = value['name']
             self.typeBox.addItems([name])
 
-        for i in range(1, 31):
+        for i in range(0, 31):
             self.daysBox.addItems([str(i)])
+        self.daysBox.setCurrentIndex(1)
 
         for i in range(1, 13):
             self.hoursBox.addItems([str(i)])
-            self.hoursBox.setCurrentIndex(7)
+        self.hoursBox.setCurrentIndex(7)
 
         self.amPmBox.addItems(['AM', 'PM'])
 
@@ -694,7 +695,7 @@ class AddTaskPanel(QWidget):
         self.taskInput.setPlainText("")
         self.userBox.setCurrentIndex(0)
         self.typeBox.setCurrentIndex(0)
-        self.daysBox.setCurrentIndex(0)
+        self.daysBox.setCurrentIndex(1)
         self.hoursBox.setCurrentIndex(7)
         self.amPmBox.setCurrentIndex(0)
 

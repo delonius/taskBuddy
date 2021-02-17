@@ -37,3 +37,4 @@ def tasksLabel(window):
     label.setGeometry(200, 340, 600, 30)
     label.setStyleSheet("font-family: Helvetica; font-size: 14px;")
     return label
+    
