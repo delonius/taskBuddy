@@ -37,6 +37,9 @@ class Applicants():
     def getApplicantCount(self):
         return len(self.applicants)
 
+    def getFinalApplicantCount(self):
+        return len(self.flexxbuyApps) + len(self.epayApps) + len(self.iqualifyApps) + len(self.flexxportalApps)
+
     def getApplicants(self):
         return self.applicants
 

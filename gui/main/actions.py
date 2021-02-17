@@ -58,3 +58,11 @@ def handleFetchClick(inputBox, app):
         app.worker.update_progress.connect(workerUpdateProgress)
         app.worker.update_progress_label.connect(workerUpdateLabel)
         app.worker.worker_success.connect(workerSuccess)
+
+
+def processChanges(app):
+    applicants = Applicants.getInstance()
+    progressBar = app.widget(app.finishLoadView).progressBar
+    processLabel = app.widget(app.finishLoadView).processLabel
+    progressBar.setValue(0)
+    progressBar.setMaximum(applicants.getFinalApplicantCount())

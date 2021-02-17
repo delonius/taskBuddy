@@ -6,7 +6,7 @@ from gui.main.styles import (
     backButtonStyle, continueButtonStyle
 )
 from gui.main.actions import handleFetchClick
-from gui.applicant.actions import backButtonClick
+from gui.applicant.actions import backButtonClick, continueButtonClick
 
 
 def inputBox(window):
@@ -85,5 +85,6 @@ def continueButton(window, app):
     button = QPushButton("Continue", window)
     button.setGeometry(430, 350, 150, 50)
     button.setStyleSheet(continueButtonStyle())
+    button.clicked.connect(lambda: continueButtonClick(app))
 
     return button

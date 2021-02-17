@@ -4,7 +4,7 @@ from gui.main.widgets import (
     inputBox, bottomRibbon, fetchButton,
     instructionLabel, logo, divider, confirmationText, backButton, continueButton
 )
-from gui.load.widgets import progressBar, fetchLabel, nameLabel, dupesLabel, tasksLabel
+from gui.load.widgets import progressBar, fetchLabel, nameLabel, dupesLabel, tasksLabel, processLabel
 from gui.applicant.widgets import *
 from applicants import Applicants
 from gui.main.styles import tabsStyle
@@ -134,6 +134,7 @@ class ApplicantView(QWidget):
         else:
             self.nextButton.setHidden(False)
 
+
 class FinishConfirmationView(QWidget):
     def __init__(self, app):
         super().__init__()
@@ -141,3 +142,11 @@ class FinishConfirmationView(QWidget):
         self.confirmationText = confirmationText(self)
         self.backButton = backButton(self, self.app)
         self.continueButton = continueButton(self, self.app)
+        
+
+class FinishLoadView(QWidget):
+    def __init__(self, app):
+        super().__init__()
+        self.app = app
+        self.progressBar = progressBar(self)
+        self.processLabel = processLabel(self)

@@ -37,4 +37,9 @@ def tasksLabel(window):
     label.setGeometry(200, 340, 600, 30)
     label.setStyleSheet("font-family: Helvetica; font-size: 14px;")
     return label
-    
+
+def processLabel(window):
+    label = QLabel("", window)
+    label.setGeometry(150, 250, 600, 30)
+    label.setStyleSheet("font-family: Helvetica; font-size: 16px;")
+    return label

@@ -1,5 +1,6 @@
 from PyQt5.QtGui import QDesktopServices
 from PyQt5.QtCore import QUrl
+from gui.main.actions import processChanges
 
 
 def handleButtonNext(tab):
@@ -10,7 +11,7 @@ def handleButtonNext(tab):
 def handleButtonPrev(tab):
     tab.decrementIndex()
     tab.updateInterface()
-    
+
 
 def bindHighriseButton(applicant):
     highriseUrl = f"https://flexxbuyapps.highrisehq.com/people/{applicant.highriseID}"
@@ -32,3 +33,7 @@ def loadFinishView(app):
 
 def backButtonClick(app):
     app.setCurrentIndex(app.appView)
+
+def continueButtonClick(app):
+    app.setCurrentIndex(app.finishLoadView)
+    processChanges(app)
