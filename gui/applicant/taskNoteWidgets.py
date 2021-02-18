@@ -1,11 +1,12 @@
 from gui.applicant.styles import taskPanelStyle
 from util import Config
 from datetime import datetime
-from PyQt5.QtGui import QColor, QFont
+from PyQt5.QtGui import QColor, QFont, QIcon
 from PyQt5.QtWidgets import (
     QTreeWidget,
     QTreeWidgetItem,
-    QHeaderView
+    QHeaderView,
+    QMessageBox
 )
 
 class TaskPanel(QTreeWidget):
