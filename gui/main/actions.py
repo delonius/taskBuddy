@@ -1,6 +1,7 @@
 from PyQt5.QtCore import QThread
 from PyQt5.QtWidgets import QApplication
-from applicants import Applicants
+from models import Applicants
+import sys
 
 
 def handleFetchClick(inputBox, app):
@@ -54,15 +55,31 @@ def handleFetchClick(inputBox, app):
         invalidData()
     else:
         app.setCurrentIndex(app.loadView)
-        app.worker.start()
-        app.worker.update_progress.connect(workerUpdateProgress)
-        app.worker.update_progress_label.connect(workerUpdateLabel)
-        app.worker.worker_success.connect(workerSuccess)
+        app.fetchWorker.start()
+        app.fetchWorker.update_progress.connect(workerUpdateProgress)
+        app.fetchWorker.update_progress_label.connect(workerUpdateLabel)
+        app.fetchWorker.worker_success.connect(workerSuccess)
 
 
 def processChanges(app):
     applicants = Applicants.getInstance()
+    applicantList = applicants.getFinalApplicantList()
     progressBar = app.widget(app.finishLoadView).progressBar
     processLabel = app.widget(app.finishLoadView).processLabel
     progressBar.setValue(0)
-    progressBar.setMaximum(applicants.getFinalApplicantCount())
+    progressBar.setMaximum(len(applicantList))
+
+    def workerUpdateProgress(progress):
+        progressBar.setValue(progress)
+
+    def workerUpdateLabel(name):
+        processLabel.setText(f"Processing changes for - {name}")
+
+    def workerSuccess():
+        print("Success!")
+        sys.exit()
+
+    app.finishWorker.start()
+    app.finishWorker.update_progress.connect(workerUpdateProgress)
+    app.finishWorker.update_progress_label.connect(workerUpdateLabel)
+    app.finishWorker.worker_success.connect(workerSuccess)

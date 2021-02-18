@@ -40,6 +40,7 @@ def tasksLabel(window):
 
 def processLabel(window):
     label = QLabel("", window)
-    label.setGeometry(150, 250, 600, 30)
+    label.setGeometry(0, 250, 800, 30)
     label.setStyleSheet("font-family: Helvetica; font-size: 16px;")
+    label.setAlignment(Qt.AlignHCenter)
     return label

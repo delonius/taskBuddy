@@ -1,7 +1,8 @@
 from PyQt5.QtWidgets import QApplication, QWidget, QStackedWidget, QMessageBox
 from PyQt5.QtGui import QIcon, QFontDatabase
 from gui.views import MainView, LoadView, ApplicantTabView, FinishConfirmationView, FinishLoadView
-from applicants import Applicants, ApplicantsWorker
+from models import Applicants
+from workers import FetchWorker, FinishWorker
 from gui.util import Config
 import sys
 
@@ -16,7 +17,8 @@ class MainWindow(QStackedWidget):
         self.setStyleSheet("background-color: white")
         self.config = Config.getInstance()
 
-        self.worker = ApplicantsWorker()
+        self.fetchWorker = FetchWorker()
+        self.finishWorker = FinishWorker()
 
         self.initUI()
         self.setCurrentIndex(self.mainView)

@@ -6,7 +6,7 @@ from gui.main.widgets import (
 )
 from gui.load.widgets import progressBar, fetchLabel, nameLabel, dupesLabel, tasksLabel, processLabel
 from gui.applicant.widgets import *
-from applicants import Applicants
+from models import Applicants
 from gui.main.styles import tabsStyle
 
 

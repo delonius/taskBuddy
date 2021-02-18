@@ -1,6 +1,4 @@
 from highton.models import Person, Group
-from PyQt5.QtCore import QThread, pyqtSignal
-import time
 from datetime import datetime, timedelta
 
 
@@ -37,8 +35,8 @@ class Applicants():
     def getApplicantCount(self):
         return len(self.applicants)
 
-    def getFinalApplicantCount(self):
-        return len(self.flexxbuyApps) + len(self.epayApps) + len(self.iqualifyApps) + len(self.flexxportalApps)
+    def getFinalApplicantList(self):
+        return self.flexxbuyApps + self.epayApps + self.iqualifyApps + self.flexxportalApps
 
     def getApplicants(self):
         return self.applicants
@@ -191,33 +189,3 @@ class Applicant():
             self.company = "Flexxbuy"
 
 
-class ApplicantsWorker(QThread):
-    update_progress = pyqtSignal(int)
-    update_progress_label = pyqtSignal(str, str)
-    worker_success = pyqtSignal(bool)
-
-    def run(self):
-        applicants = Applicants.getInstance()
-        for loanID in applicants.getLoanIDs():
-            self.update_progress_label.emit("fetch", loanID)
-            applicant = applicants.fetchHighriseApplicant(loanID)
-            if applicant == "duplicate" or loanID in applicants.allIDs or not applicant:
-                applicants.applicants.append([])
-                self.update_progress.emit(applicants.getApplicantCount())
-                continue
-            applicants.allIDs.append(applicant)
-            self.update_progress_label.emit("name", applicant.name)
-            time.sleep(1)
-            self.update_progress_label.emit("duplicates", "")
-            applicant.findDuplicates()
-            self.update_progress_label.emit("tasks", "")
-            applicant.findTasks()
-            applicant.addToGroup(applicants)
-            if applicant.isReApp:
-                applicant.addReAppCompany()
-            self.update_progress.emit(applicants.getApplicantCount())
-            self.update_progress_label.emit("clear", "")
-        if len(applicants.allIDs) > 0:
-            self.worker_success.emit(True)
-        else:
-            self.worker_success.emit(False)

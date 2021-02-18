@@ -609,6 +609,7 @@ class AddTaskPanel(QWidget):
             task.body = body
             task.subject_type = "Party"
             task.subject_id = self.applicant.highriseID
+            task.public = True
             category = None
             for key, value in self.config.taskCategories.items():
                 if value['name'] == self.typeBox.currentText():
