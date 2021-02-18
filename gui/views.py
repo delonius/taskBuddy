@@ -5,7 +5,10 @@ from gui.main.widgets import (
     instructionLabel, logo, divider, confirmationText, backButton, continueButton
 )
 from gui.load.widgets import progressBar, fetchLabel, nameLabel, dupesLabel, tasksLabel, processLabel
-from gui.applicant.widgets import *
+from gui.applicant.generalWidgets import *
+from gui.applicant.applicantWidgets import *
+from gui.applicant.taskNoteWidgets import *
+from gui.applicant.addEditWidgets import *
 from models import Applicants
 from gui.main.styles import tabsStyle
 
