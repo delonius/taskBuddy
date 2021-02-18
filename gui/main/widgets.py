@@ -6,6 +6,7 @@ from gui.main.styles import (
     backButtonStyle, continueButtonStyle
 )
 from gui.main.actions import handleFetchClick, backButtonClick, continueButtonClick
+import sys
 
 
 def inputBox(window):
@@ -85,5 +86,22 @@ def continueButton(window, app):
     button.setGeometry(430, 350, 150, 50)
     button.setStyleSheet(continueButtonStyle())
     button.clicked.connect(lambda: continueButtonClick(app))
+
+    return button
+
+def finalConfirmationText(window):
+    text = "Your changes have been \nadded successfully!\nThank you for using TaskBuddy!"
+    label = QLabel(text, window)
+    label.setGeometry(200, 150, 400, 300)
+    label.setStyleSheet(instructionLabelStyle())
+    label.setAlignment(Qt.AlignHCenter)
+
+    return label
+
+def exitButton(window, app):
+    button = QPushButton("Exit", window)
+    button.setGeometry(325, 325, 150, 50)
+    button.setStyleSheet(backButtonStyle())
+    button.clicked.connect(lambda: sys.exit())
 
     return button

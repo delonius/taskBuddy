@@ -1,10 +1,7 @@
 from PyQt5.QtWidgets import QWidget, QTabWidget, QLabel
 from PyQt5.QtCore import Qt
-from gui.main.widgets import (
-    inputBox, bottomRibbon, fetchButton,
-    instructionLabel, logo, divider, confirmationText, backButton, continueButton
-)
-from gui.load.widgets import progressBar, fetchLabel, nameLabel, dupesLabel, tasksLabel, processLabel
+from gui.main.widgets import *
+from gui.load.widgets import *
 from gui.applicant.generalWidgets import *
 from gui.applicant.applicantWidgets import *
 from gui.applicant.taskNoteWidgets import *
@@ -153,3 +150,10 @@ class FinishLoadView(QWidget):
         self.app = app
         self.progressBar = progressBar(self)
         self.processLabel = processLabel(self)
+
+class FinalConfirmationView(QWidget):
+    def __init__(self, app):
+        super().__init__()
+        self.app = app
+        self.confirmationText = finalConfirmationText(self)
+        self.exitButton = exitButton(self, self.app)

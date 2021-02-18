@@ -1,4 +1,3 @@
-from PyQt5.QtCore import QThread
 from PyQt5.QtWidgets import QApplication
 from models import Applicants
 import sys
@@ -76,8 +75,7 @@ def processChanges(app):
         processLabel.setText(f"Processing changes for - {name}")
 
     def workerSuccess():
-        print("Success!")
-        sys.exit()
+        app.setCurrentIndex(app.finalConfirmationView)
 
     app.finishWorker.start()
     app.finishWorker.update_progress.connect(workerUpdateProgress)
