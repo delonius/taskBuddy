@@ -3,7 +3,7 @@ from PyQt5.QtGui import QIcon, QFontDatabase
 from gui.views import MainView, LoadView, ApplicantTabView, FinishConfirmationView, FinishLoadView
 from models import Applicants
 from workers import FetchWorker, FinishWorker
-from gui.util import Config
+from util import Config
 import sys
 
 

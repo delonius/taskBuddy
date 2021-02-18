@@ -187,5 +187,3 @@ class Applicant():
             self.company = "ePay"
         else:
             self.company = "Flexxbuy"
-
-

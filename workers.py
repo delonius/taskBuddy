@@ -2,7 +2,7 @@ from PyQt5.QtCore import QThread, pyqtSignal
 from models import Applicants
 from datetime import timedelta
 from requests.auth import HTTPBasicAuth
-from gui.util import Config
+from util import Config
 import requests
 import time
 

@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta
-from gui.util import Config
+from util import Config
 from gui.applicant.styles import *
 from gui.applicant.actions import *
 from PyQt5.QtCore import Qt
