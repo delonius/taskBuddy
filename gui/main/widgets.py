@@ -5,8 +5,7 @@ from gui.main.styles import (
     inputBoxStyle, fetchButtonStyle, instructionLabelStyle,
     backButtonStyle, continueButtonStyle
 )
-from gui.main.actions import handleFetchClick
-from gui.applicant.actions import backButtonClick, continueButtonClick
+from gui.main.actions import handleFetchClick, backButtonClick, continueButtonClick
 
 
 def inputBox(window):

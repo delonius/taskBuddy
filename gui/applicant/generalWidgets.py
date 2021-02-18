@@ -1,5 +1,6 @@
 from PyQt5.QtCore import Qt
-from gui.applicant.actions import handleButtonPrev, handleButtonNext, loadFinishView
+from gui.applicant.actions import handleButtonPrev, handleButtonNext 
+from gui.main.actions import loadFinishView
 from PyQt5.QtWidgets import (
     QGroupBox, 
     QLabel,

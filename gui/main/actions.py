@@ -83,3 +83,14 @@ def processChanges(app):
     app.finishWorker.update_progress.connect(workerUpdateProgress)
     app.finishWorker.update_progress_label.connect(workerUpdateLabel)
     app.finishWorker.worker_success.connect(workerSuccess)
+
+
+def loadFinishView(app):
+    app.setCurrentIndex(app.confirmationView)
+
+def backButtonClick(app):
+    app.setCurrentIndex(app.appView)
+
+def continueButtonClick(app):
+    app.setCurrentIndex(app.finishLoadView)
+    processChanges(app)
