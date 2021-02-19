@@ -2,8 +2,11 @@ from gui.applicant.styles import (
     inputBoxStyle,
     applicantTabPanelStyle,
     gatewayButtonStyle,
-    deleteButtonStyle
+    deleteButtonStyle,
+    calendarStyle,
+    dateButtonStyle
 )
+from gui.applicant.actions import showCalendar
 from highton.models import Note, Task
 from util import Config
 from datetime import datetime, timedelta
@@ -15,7 +18,8 @@ from PyQt5.QtWidgets import (
     QPushButton,
     QPlainTextEdit,
     QComboBox,
-    QMessageBox
+    QMessageBox,
+    QCalendarWidget
 )
 
 class CreatePanel(QTabWidget):
@@ -73,8 +77,8 @@ class AddTaskPanel(QWidget):
         self.dueAtLabel.setStyleSheet(
             "font-family: Helvetica; font-weight: bold;")
 
-        self.dueAtInfoLabel = QLabel("days, at ", self)
-        self.dueAtInfoLabel.setGeometry(135 + x, 90 + y, 100, 30)
+        self.dueAtInfoLabel = QLabel(", at ", self)
+        self.dueAtInfoLabel.setGeometry(165 + x, 90 + y, 100, 30)
         self.dueAtInfoLabel.setStyleSheet(
             "font-family: Helvetica; font-weight: bold;")
 
@@ -89,14 +93,23 @@ class AddTaskPanel(QWidget):
         self.typeBox = QComboBox(self)
         self.typeBox.setGeometry(250 + x, 53 + y, 100, 30)
 
-        self.daysBox = QComboBox(self)
-        self.daysBox.setGeometry(70 + x, 93 + y, 60, 30)
+        self.dateBox = QPushButton(self)
+        self.dateBox.setGeometry(70 + x, 93 + y, 90, 30)
+        self.dateBox.clicked.connect(lambda: showCalendar(self))
+        self.dateBox.setStyleSheet(dateButtonStyle())
 
         self.hoursBox = QComboBox(self)
         self.hoursBox.setGeometry(200 + x, 93 + y, 60, 30)
 
         self.amPmBox = QComboBox(self)
         self.amPmBox.setGeometry(270 + x, 93 + y, 60, 30)
+
+        self.calendar = QCalendarWidget(self.root.createBox)
+        self.calendar.setGeometry(0, 0, 368, 230)
+        self.calendar.setVerticalHeaderFormat(QCalendarWidget.NoVerticalHeader)
+        self.calendar.setStyleSheet(calendarStyle())
+        self.calendar.setGridVisible(True)
+        self.calendar.setHidden(True)
 
         if not self.editMode:
             self.addButton = QPushButton("Add Task", self)
@@ -126,9 +139,7 @@ class AddTaskPanel(QWidget):
             name = value['name']
             self.typeBox.addItems([name])
 
-        for i in range(0, 31):
-            self.daysBox.addItems([str(i)])
-        self.daysBox.setCurrentIndex(1)
+        self.dateBox.setText(datetime.today().strftime('%d/%m/%Y'))
 
         for i in range(1, 13):
             self.hoursBox.addItems([str(i)])
@@ -142,7 +153,7 @@ class AddTaskPanel(QWidget):
     def addTask(self):
         body = self.taskInput.toPlainText()
         if body:
-            days = int(self.daysBox.currentText())
+            days = int(self.dateBox.currentText())
             hour = int(self.hoursBox.currentText())
             if self.amPmBox.currentText() == 'PM':
                 hour = hour + 12
@@ -241,7 +252,7 @@ class AddTaskPanel(QWidget):
         self.taskInput.setPlainText("")
         self.userBox.setCurrentIndex(0)
         self.typeBox.setCurrentIndex(0)
-        self.daysBox.setCurrentIndex(1)
+        self.dateBox.setCurrentIndex(1)
         self.hoursBox.setCurrentIndex(7)
         self.amPmBox.setCurrentIndex(0)
 

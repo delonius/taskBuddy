@@ -27,3 +27,5 @@ def bindFlexxportalButton(applicant):
     flexxportalUrl = f"https://app.flexxbuy.com/r/application/{applicant.loanID}/details/"
     QDesktopServices.openUrl(QUrl(flexxportalUrl))
 
+def showCalendar(window):
+    window.calendar.setHidden(False)

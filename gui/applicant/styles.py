@@ -176,3 +176,21 @@ def inputBoxStyle():
                 background-color: #819C0B;
             }
             """
+
+def calendarStyle():
+    return """
+            QCalendarWidget {
+                background-color: #DDDDDD;
+            }
+            QCalendarWidget QToolButton {
+                color: black;
+            }
+            """
+
+def dateButtonStyle():
+    return """
+            QPushButton {
+                background-color: white;
+                border: 1.5px solid #666666;
+            }
+            """
