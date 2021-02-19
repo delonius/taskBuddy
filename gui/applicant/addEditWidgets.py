@@ -139,7 +139,7 @@ class AddTaskPanel(QWidget):
             name = value['name']
             self.typeBox.addItems([name])
 
-        self.dateBox.setText(datetime.today().strftime('%d/%m/%Y'))
+        self.dateBox.setText(datetime.today().strftime('%m/%d/%Y'))
 
         for i in range(1, 13):
             self.hoursBox.addItems([str(i)])
