@@ -11,6 +11,7 @@ from highton.models import Note, Task
 from util import Config
 from datetime import datetime, timedelta
 from PyQt5.QtGui import QIcon
+from PyQt5.QtCore import QDate
 from PyQt5.QtWidgets import (
     QWidget,
     QTabWidget,
@@ -77,7 +78,7 @@ class AddTaskPanel(QWidget):
         self.dueAtLabel.setStyleSheet(
             "font-family: Helvetica; font-weight: bold;")
 
-        self.dueAtInfoLabel = QLabel(", at ", self)
+        self.dueAtInfoLabel = QLabel("at", self)
         self.dueAtInfoLabel.setGeometry(165 + x, 90 + y, 100, 30)
         self.dueAtInfoLabel.setStyleSheet(
             "font-family: Helvetica; font-weight: bold;")
@@ -110,6 +111,7 @@ class AddTaskPanel(QWidget):
         self.calendar.setStyleSheet(calendarStyle())
         self.calendar.setGridVisible(True)
         self.calendar.setHidden(True)
+        self.calendar.clicked.connect(self.selectDate)
 
         if not self.editMode:
             self.addButton = QPushButton("Add Task", self)
@@ -127,6 +129,11 @@ class AddTaskPanel(QWidget):
             self.deleteButton.setStyleSheet(deleteButtonStyle())
             self.deleteButton.clicked.connect(self.deletePrompt)
 
+    def selectDate(self, date):
+        pyDate = date.toPyDate()
+        self.dateBox.setText(pyDate.strftime('%m/%d/%Y'))
+        self.calendar.setHidden(True)
+
     def populateFields(self):
         self.userBox.addItems(['Me'])
         for user, value in self.config.users.items():
@@ -139,7 +146,13 @@ class AddTaskPanel(QWidget):
             name = value['name']
             self.typeBox.addItems([name])
 
-        self.dateBox.setText(datetime.today().strftime('%m/%d/%Y'))
+        weekendDays = ['Fri', 'Sat', 'Sun']
+        nextDay = datetime.today() + timedelta(days=1)
+        while nextDay.strftime('%a') in weekendDays:
+            nextDay += timedelta(days=1)
+
+        self.dateBox.setText(nextDay.strftime('%m/%d/%Y'))
+        self.calendar.setSelectedDate(nextDay)
 
         for i in range(1, 13):
             self.hoursBox.addItems([str(i)])

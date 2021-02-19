@@ -1,5 +1,5 @@
 from PyQt5.QtGui import QDesktopServices
-from PyQt5.QtCore import QUrl
+from PyQt5.QtCore import QUrl, QDate, Qt
 from gui.main.actions import processChanges
 
 
