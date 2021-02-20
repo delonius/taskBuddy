@@ -103,8 +103,6 @@ class TaskPanel(QTreeWidget):
         if task.category_id:
             typeIndex = editTaskPanel.typeBox.findText(
                 self.config.taskCategories[str(task.category_id)]['name'])
-        daysIndex = editTaskPanel.daysBox.findText(
-            str(task.due_at.day - datetime.now().day))
         hours = task.due_at.strftime("%#I")
         amPmIndex = 0
         if task.due_at.strftime("%p") == 'PM':
@@ -114,7 +112,8 @@ class TaskPanel(QTreeWidget):
         editTaskPanel.taskInput.setPlainText(task.body)
         editTaskPanel.userBox.setCurrentIndex(userIndex)
         editTaskPanel.typeBox.setCurrentIndex(typeIndex)
-        editTaskPanel.daysBox.setCurrentIndex(daysIndex)
+        editTaskPanel.dateBox.setText(task.due_at.strftime('%m/%d/%Y'))
+        editTaskPanel.calendar.setSelectedDate(task.due_at)
         editTaskPanel.hoursBox.setCurrentIndex(hoursIndex)
         editTaskPanel.amPmBox.setCurrentIndex(amPmIndex)
 

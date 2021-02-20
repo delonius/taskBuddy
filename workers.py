@@ -17,7 +17,6 @@ class FetchWorker(QThread):
             self.update_progress_label.emit("fetch", loanID)
             applicant = applicants.fetchHighriseApplicant(loanID)
             if applicant == "duplicate" or loanID in applicants.allIDs or not applicant:
-                applicants.applicants.append([])
                 self.update_progress.emit(applicants.getApplicantCount())
                 continue
             applicants.allIDs.append(applicant)

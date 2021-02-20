@@ -181,6 +181,7 @@ def calendarStyle():
     return """
             QCalendarWidget {
                 background-color: #DDDDDD;
+                border-bottom: 1px solid gray;
             }
             QCalendarWidget QToolButton {
                 color: black;
@@ -191,6 +192,6 @@ def dateButtonStyle():
     return """
             QPushButton {
                 background-color: white;
-                border: 1.5px solid #666666;
+                border: 1.5px solid #999999;
             }
             """

@@ -106,7 +106,7 @@ class AddTaskPanel(QWidget):
         self.amPmBox.setGeometry(270 + x, 93 + y, 60, 30)
 
         self.calendar = QCalendarWidget(self.root.createBox)
-        self.calendar.setGeometry(0, 0, 368, 230)
+        self.calendar.setGeometry(1, 0, 367, 226)
         self.calendar.setVerticalHeaderFormat(QCalendarWidget.NoVerticalHeader)
         self.calendar.setStyleSheet(calendarStyle())
         self.calendar.setGridVisible(True)
@@ -166,14 +166,13 @@ class AddTaskPanel(QWidget):
     def addTask(self):
         body = self.taskInput.toPlainText()
         if body:
-            days = int(self.dateBox.currentText())
             hour = int(self.hoursBox.currentText())
             if self.amPmBox.currentText() == 'PM':
                 hour = hour + 12
                 if hour == 24:
                     hour = 0
-            dueAt = datetime.now().replace(
-                hour=hour, minute=0, second=0, microsecond=0) + timedelta(days=days)
+            parsedDate = datetime.strptime(self.dateBox.text(), '%m/%d/%Y')
+            dueAt = parsedDate.replace(hour=hour, minute=0, second=0, microsecond=0)
             task = Task()
             task.body = body
             task.subject_type = "Party"
@@ -265,9 +264,14 @@ class AddTaskPanel(QWidget):
         self.taskInput.setPlainText("")
         self.userBox.setCurrentIndex(0)
         self.typeBox.setCurrentIndex(0)
-        self.dateBox.setCurrentIndex(1)
         self.hoursBox.setCurrentIndex(7)
         self.amPmBox.setCurrentIndex(0)
+        weekendDays = ['Fri', 'Sat', 'Sun']
+        nextDay = datetime.today() + timedelta(days=1)
+        while nextDay.strftime('%a') in weekendDays:
+            nextDay += timedelta(days=1)
+
+        self.dateBox.setText(nextDay.strftime('%m/%d/%Y'))
 
 
 class AddNotePanel(QWidget):
