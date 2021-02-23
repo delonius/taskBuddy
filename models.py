@@ -146,7 +146,12 @@ class Applicant():
 
     def findTasks(self):
         self.existingTasks = self.applicant.list_tasks()
-        self.existingNotes = self.applicant.list_notes()
+        self.existingNotes = None
+        try:
+            self.existingNotes = self.applicant.list_notes()
+        except:
+            self.existingNotes = []
+
         for task in self.existingTasks:
             task.due_at = task.due_at + timedelta(hours=-5)
 

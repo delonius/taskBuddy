@@ -24,6 +24,7 @@ from PyQt5.QtWidgets import (
     QCalendarWidget
 )
 
+
 class CreatePanel(QTabWidget):
     def __init__(self, parent, root, applicant):
         super().__init__(parent)
@@ -90,7 +91,7 @@ class AddTaskPanel(QWidget):
 
         self.taskInputStyle = taskInputStyle()
         self.taskInput = QPlainTextEdit(self)
-        self.taskInput.setGeometry(70 + x, 14 + y, 260, 28)
+        self.taskInput.setGeometry(72 + x, 15 + y, 254, 28)
         self.taskInput.setStyleSheet(self.taskInputStyle)
         self.taskInput.setHidden(True)
 
@@ -195,7 +196,8 @@ class AddTaskPanel(QWidget):
                 if hour == 24:
                     hour = 0
             parsedDate = datetime.strptime(self.dateBox.text(), '%m/%d/%Y')
-            dueAt = parsedDate.replace(hour=hour, minute=0, second=0, microsecond=0)
+            dueAt = parsedDate.replace(
+                hour=hour, minute=0, second=0, microsecond=0)
             task = Task()
             task.body = body
             task.subject_type = "Party"
@@ -296,6 +298,9 @@ class AddTaskPanel(QWidget):
             setDay += timedelta(days=1)
         while setDay.strftime('%a') in weekendDays:
             setDay += timedelta(days=1)
+
+        if self.templateBox.currentText() == '<Custom Task>':
+            self.templateBox.setCurrentIndex(0)
 
         self.dateBox.setText(setDay.strftime('%m/%d/%Y'))
 

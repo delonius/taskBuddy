@@ -122,6 +122,7 @@ def gatewayButtonStyle():
             }
             """
 
+
 def deleteButtonStyle():
     return """
             QPushButton {
@@ -177,13 +178,19 @@ def inputBoxStyle():
             }
             """
 
+
 def taskInputStyle():
     return """
             QPlainTextEdit {
                 background-color: #FDFDFD;
                 font-size: 14px;
+                border: 0px;
+            }
+            QPlainTextEdit:selected {
+                border: 0px;
             }
             """
+
 
 def calendarStyle():
     return """
@@ -195,6 +202,7 @@ def calendarStyle():
                 color: black;
             }
             """
+
 
 def dateButtonStyle():
     return """
