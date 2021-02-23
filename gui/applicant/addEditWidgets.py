@@ -4,7 +4,8 @@ from gui.applicant.styles import (
     gatewayButtonStyle,
     deleteButtonStyle,
     calendarStyle,
-    dateButtonStyle
+    dateButtonStyle,
+    taskInputStyle
 )
 from gui.applicant.actions import showCalendar
 from highton.models import Note, Task
@@ -83,10 +84,15 @@ class AddTaskPanel(QWidget):
         self.dueAtInfoLabel.setStyleSheet(
             "font-family: Helvetica; font-weight: bold;")
 
-        self.inputBoxStyle = inputBoxStyle()
+        self.templateBox = QComboBox(self)
+        self.templateBox.setGeometry(70 + x, 13 + y, 280, 30)
+        self.templateBox.activated.connect(self.taskBoxSelection)
+
+        self.taskInputStyle = taskInputStyle()
         self.taskInput = QPlainTextEdit(self)
-        self.taskInput.setGeometry(70 + x, 13 + y, 280, 30)
-        self.taskInput.setStyleSheet(self.inputBoxStyle)
+        self.taskInput.setGeometry(70 + x, 14 + y, 260, 28)
+        self.taskInput.setStyleSheet(self.taskInputStyle)
+        self.taskInput.setHidden(True)
 
         self.userBox = QComboBox(self)
         self.userBox.setGeometry(70 + x, 53 + y, 120, 30)
@@ -129,6 +135,13 @@ class AddTaskPanel(QWidget):
             self.deleteButton.setStyleSheet(deleteButtonStyle())
             self.deleteButton.clicked.connect(self.deletePrompt)
 
+    def taskBoxSelection(self, index):
+        if self.templateBox.itemText(index) == '<Custom Task>':
+            self.taskInput.setHidden(False)
+            self.taskInput.setFocus()
+        else:
+            self.taskInput.setHidden(True)
+
     def selectDate(self, date):
         pyDate = date.toPyDate()
         self.dateBox.setText(pyDate.strftime('%m/%d/%Y'))
@@ -141,18 +154,24 @@ class AddTaskPanel(QWidget):
                 name = value['name']
                 self.userBox.addItems([name])
 
+        for item in self.config.taskTemplates.keys():
+            self.templateBox.addItems([item])
+        self.templateBox.addItems(['<Custom Task>'])
+
         self.typeBox.addItems(['None'])
         for category, value in self.config.taskCategories.items():
             name = value['name']
             self.typeBox.addItems([name])
 
         weekendDays = ['Fri', 'Sat', 'Sun']
-        nextDay = datetime.today() + timedelta(days=1)
-        while nextDay.strftime('%a') in weekendDays:
-            nextDay += timedelta(days=1)
+        setDay = datetime.today()
+        if datetime.now().hour >= 17:
+            setDay += timedelta(days=1)
+        while setDay.strftime('%a') in weekendDays:
+            setDay += timedelta(days=1)
 
-        self.dateBox.setText(nextDay.strftime('%m/%d/%Y'))
-        self.calendar.setSelectedDate(nextDay)
+        self.dateBox.setText(setDay.strftime('%m/%d/%Y'))
+        self.calendar.setSelectedDate(setDay)
 
         for i in range(1, 13):
             self.hoursBox.addItems([str(i)])
@@ -164,7 +183,11 @@ class AddTaskPanel(QWidget):
         self.applicant = applicant
 
     def addTask(self):
-        body = self.taskInput.toPlainText()
+        body = None
+        if self.taskInput.isHidden():
+            body = self.templateBox.currentText()
+        else:
+            body = self.taskInput.toPlainText()
         if body:
             hour = int(self.hoursBox.currentText())
             if self.amPmBox.currentText() == 'PM':
@@ -262,16 +285,19 @@ class AddTaskPanel(QWidget):
 
     def resetInterface(self):
         self.taskInput.setPlainText("")
+        self.taskInput.setHidden(True)
         self.userBox.setCurrentIndex(0)
         self.typeBox.setCurrentIndex(0)
         self.hoursBox.setCurrentIndex(7)
         self.amPmBox.setCurrentIndex(0)
         weekendDays = ['Fri', 'Sat', 'Sun']
-        nextDay = datetime.today() + timedelta(days=1)
-        while nextDay.strftime('%a') in weekendDays:
-            nextDay += timedelta(days=1)
+        setDay = datetime.today()
+        if datetime.now().hour >= 17:
+            setDay += timedelta(days=1)
+        while setDay.strftime('%a') in weekendDays:
+            setDay += timedelta(days=1)
 
-        self.dateBox.setText(nextDay.strftime('%m/%d/%Y'))
+        self.dateBox.setText(setDay.strftime('%m/%d/%Y'))
 
 
 class AddNotePanel(QWidget):

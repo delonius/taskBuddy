@@ -35,6 +35,7 @@ class Config():
             self.users = data["users"]
             self.taskCategories = data["taskCategories"]
             self.auth = data["auth"]
+            self.taskTemplates = data["taskTemplates"]
             HightonSettings(username=self.auth["username"]+"@flexxbuyapps",
                         api_key=self.auth["token"])
             self.id = User.me().id

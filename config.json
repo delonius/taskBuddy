@@ -38,5 +38,11 @@
             "color": "#660099",
             "name": "Unlikely"
         }
+    },
+    "taskTemplates": {
+        "Pre Approved Offers": null,
+        "Reminder Text": null,
+        "Email 1": null,
+        "Final Email": null
     }
 }

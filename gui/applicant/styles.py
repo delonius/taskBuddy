@@ -177,6 +177,14 @@ def inputBoxStyle():
             }
             """
 
+def taskInputStyle():
+    return """
+            QPlainTextEdit {
+                background-color: #FDFDFD;
+                font-size: 14px;
+            }
+            """
+
 def calendarStyle():
     return """
             QCalendarWidget {
