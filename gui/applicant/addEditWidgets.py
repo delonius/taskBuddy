@@ -218,7 +218,7 @@ class AddTaskPanel(QWidget):
 
             if self.editTask:
                 unchanged = True
-                if not self.editTask.body == task.body:
+                if not self.editTask.body.lower() == task.body.lower():
                     unchanged = False
                 if not str(self.editTask.owner_id) == str(task.owner_id):
                     unchanged = False

@@ -1,6 +1,7 @@
 from gui.applicant.styles import taskPanelStyle
 from util import Config
 from datetime import datetime
+from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QColor, QFont, QIcon
 from PyQt5.QtWidgets import (
     QTreeWidget,
@@ -8,6 +9,7 @@ from PyQt5.QtWidgets import (
     QHeaderView,
     QMessageBox
 )
+
 
 class TaskPanel(QTreeWidget):
     def __init__(self, parent, root, applicant):
@@ -109,7 +111,14 @@ class TaskPanel(QTreeWidget):
             amPmIndex = 1
         hoursIndex = editTaskPanel.hoursBox.findText(hours)
 
-        editTaskPanel.taskInput.setPlainText(task.body)
+        templateBoxIndex = editTaskPanel.templateBox.findText(
+            task.body, Qt.MatchFixedString)
+        if templateBoxIndex >= 0:
+            editTaskPanel.templateBox.setCurrentIndex(templateBoxIndex)
+        else:
+            editTaskPanel.taskInput.setHidden(False)
+            editTaskPanel.taskInput.setPlainText(task.body)
+
         editTaskPanel.userBox.setCurrentIndex(userIndex)
         editTaskPanel.typeBox.setCurrentIndex(typeIndex)
         editTaskPanel.dateBox.setText(task.due_at.strftime('%m/%d/%Y'))
